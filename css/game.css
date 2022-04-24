@@ -1,0 +1,80 @@
+@font-face {
+  font-family: PublicPixel;
+  src: url(../ttf/public_pixel.ttf);
+}
+
+.label_left {
+	text-align: left;
+}
+
+.label_right {
+	text-align: right;
+}
+
+.label {
+	position: absolute;
+	overflow: hidden;
+
+	z-index: 3;
+	pointer-events: none;
+
+	font-family: PublicPixel;
+	font-weight: bold;
+	font-size: 4px;
+	color: #ffffff;
+}
+
+.effect {
+	position: absolute;
+	overflow: hidden;
+
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+
+	z-index: 2;
+	pointer-events: none;
+}
+
+.item {
+	position: absolute;
+	overflow: hidden;
+
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+
+	z-index: 1;
+	pointer-events: none;
+}
+
+.background {
+	position: absolute;
+	overflow: hidden;
+
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+
+	z-index: 0;
+	pointer-events: none;
+}
+
+.game {
+	position: absolute;
+	overflow: hidden;
+
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+
+	z-index: 0;
+	pointer-events: none;
+}
+
+.canvas {
+	position: absolute;
+	overflow: hidden;
+
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+
+	z-index: 0;
+	pointer-events: none;
+}
