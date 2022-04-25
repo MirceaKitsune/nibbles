@@ -28,7 +28,7 @@ function css_box(element, box) {
 var settings_overrides = [
 	// Warmup cycle: 2x pills, 2 colors max
 	{ "level": 0, "setting": "item_length", "value": [2] },
-	{ "level": 0, "setting": "item_colors", "value": [0, 0, 1] },
+	{ "level": 0, "setting": "item_colors", "value": [0, 1] },
 	// 1st cycle: 2x pills, 3 colors max
 	{ "level": 5, "setting": "item_length", "value": [2] },
 	{ "level": 5, "setting": "item_colors", "value": [0, 0, 0, 1, 1, 2] },
@@ -50,7 +50,7 @@ var settings_overrides = [
 	{ "level": 75, "setting": "item_colors", "value": [3, 3, 3, 5, 5, 1] },
 	{ "level": 80, "setting": "item_colors", "value": [4, 4, 4, 0, 0, 2] },
 	{ "level": 85, "setting": "item_colors", "value": [5, 5, 5, 1, 1, 3] },
-	// Final cycle: 2x - 4x pills, 4 colors max
+	// Final cycle: 2x - 4x pills, 3 colors max
 	{ "level": 90, "setting": "item_length", "value": [2] },
 	{ "level": 96, "setting": "item_length", "value": [1] },
 	{ "level": 97, "setting": "item_length", "value": [2] },
@@ -66,9 +66,9 @@ var settings_overrides = [
 ];
 for(let i = 0; i <= 99; i++) {
 	// Tick rate ranges from 1.0 to 0.2 for 100 levels
-	// Target chance ranges from 0.1 to 0.2: For the best difficulty curve it peaks at level 50 then decreases again
+	// Target chance ranges from 0.5 to 0.25: For the best difficulty curve it peaks at level 50 then decreases again
 	settings_overrides.push({ "level": i, "setting": "time", "value": 1 - i / 125 });
-	settings_overrides.push({ "level": i, "setting": "target_chance", "value": 0.1 + (Math.abs(50 - i) / 50) * 0.1 });
+	settings_overrides.push({ "level": i, "setting": "target_chance", "value": 0.25 + (Math.abs(50 - i) / 50) * 0.25 });
 }
 
 // Settings prefixed with item_* are arrays of indexes, the same item can be added multiple times to influence probabilities
@@ -85,8 +85,50 @@ const settings = {
 	"chain": 3,
 	"item_length": [],
 	"item_colors": [],
-	"statuses": [4, 4, 2, 2, 3, 3, 1, 1],
+	"statuses": [5, 5, 2.5, 2.5, 3.75, 3.75, 1, 1],
 	"overrides": settings_overrides
+}
+
+// Static class used to load and read assets universally
+class data {
+	static counter = 0;
+	static images = {};
+
+	// Called with true when an asset is added and false when it finished loading, the game launches once the counter is zero
+	static count(add) {
+		data.counter += add ? -1 : +1;
+		if(data.counter == 0)
+			new game(canvas, settings);
+	}
+
+	// Load an image asset
+	static load_image(name) {
+		if(data.images.hasOwnProperty(name))
+			return;
+		data.count(true);
+		data.images[name] = new Image();
+		data.images[name].src = "img/" + name + ".gif";
+		data.images[name].onload = function() {
+			data.count(false);
+		};
+	}
+
+	// Preload all assets used by the game
+	static load() {
+		data.load_image("background");
+		data.load_image("effect_clear");
+		data.load_image("effect_drop");
+		for(let c in ITEM_COLOR) {
+			data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_TARGET);
+			data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SINGLE);
+			for(let t in ITEM_SPRITE_SEGMENT_START)
+				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_START[t]);
+			for(let t in ITEM_SPRITE_SEGMENT_CENTER)
+				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_CENTER[t]);
+			for(let t in ITEM_SPRITE_SEGMENT_END)
+				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_END[t]);
+		}
+	}
 }
 
 // Visual effect, shows for a given amount of time then removes itself
@@ -94,7 +136,7 @@ class effect {
 	constructor(parent, position, resolution, image, duration) {
 		this.element = document.createElement("img");
 		this.element.setAttribute("class", "effect");
-		this.element.setAttribute("src", "img/" + image + ".gif");
+		this.element.setAttribute("src", data.images[image].src);
 		css_box(this.element, [position[0] * resolution, position[1] * resolution, resolution, resolution]);
 		parent.appendChild(this.element);
 		setTimeout(this.remove.bind(this), duration * 1000);
@@ -133,7 +175,7 @@ class item_static {
 			this.elements[index].setAttribute("class", "item");
 			this.parent.appendChild(this.elements[index]);
 		}
-		this.elements[index].setAttribute("src", "img/item_" + color + "_" + type + ".gif");
+		this.elements[index].setAttribute("src", data.images["item_" + color + "_" + type].src);
 		css_box(this.elements[index], [(pos[0] + this.settings.offset[0]) * this.settings.resolution, (pos[1] + this.settings.offset[1]) * this.settings.resolution, this.settings.resolution, this.settings.resolution]);
 	}
 
@@ -161,7 +203,7 @@ class item_static {
 		return undefined;
 	}
 
-	// Returns the segment at index as [x, y, color], given the specified item position / angle, origin is centered based on item length
+	// Returns the segment at index as [x, y, color], given the specified item position / angle
 	get_segment_at(position, angle, index) {
 		var dir = [0, 0];
 		if(angle == 0)
@@ -172,8 +214,12 @@ class item_static {
 			dir = [0, +1];
 		else if(angle == 3)
 			dir = [-1, 0];
-		const dist = Math.floor((this.colors.length - 1) / 2);
-		return [(position[0] - dist * dir[0]) + (index * dir[0]), (position[1] - dist * dir[1]) + (index * dir[1]), this.colors[index]];
+
+		// The center is based on item length, if the item has an even number of segments the origin must be offset to ensure rotation occurs at the same position
+		var center = Math.floor((this.colors.length - 1) / 2);
+		if(this.colors.length % 2 == 0 && (dir[0] < 0 || dir[1] < 0))
+			center++;
+		return [(position[0] - center * dir[0]) + (index * dir[0]), (position[1] - center * dir[1]) + (index * dir[1]), this.colors[index]];
 	}
 
 	// Returns an array containing the positions and colors of all segments as [x, y, color]
@@ -201,6 +247,7 @@ class item_static {
 	set_target(target) {
 		if(this.colors.length != 1)
 			return;
+		this.active = false;
 		this.target = target;
 		this.update();
 	}
@@ -242,21 +289,24 @@ class item extends item_static {
 	}
 
 	// Move the item based on position and angle offset, targets can't be moved
-	move(position, angle, drop) {
+	move(position, angle) {
 		if(this.target)
 			return;
 
 		var new_position = [this.position[0] + position[0], this.position[1] + position[1]];
 		var new_angle = this.angle + angle;
-		if(new_angle < 0)
-			new_angle = 3;
-		else if(new_angle > 3)
+		if(new_angle > 3 || this.colors.length == 1)
 			new_angle = 0;
+		else if(new_angle < 0)
+			new_angle = 3;
 
-		if(!this.collides(new_position, new_angle)) {
+		if((new_position[0] != this.position[0] || new_position[1] != this.position[1] || new_angle != this.angle) && !this.collides(new_position, new_angle)) {
 			this.set_pos(new_position, new_angle);
-			if(drop)
-				this.move(position, angle, drop);
+			if(this.sitting()) {
+				const segments = this.get_segments();
+				for(let s in segments)
+					new effect(this.parent, [segments[s][0] + this.settings.offset[0], segments[s][1] + this.settings.offset[1]], this.settings.resolution, "effect_drop", 0.25);
+			}
 		}
 	}
 }
@@ -266,7 +316,7 @@ class game_background {
 	constructor(parent, box) {
 		this.element_background = document.createElement("img");
 		this.element_background.setAttribute("class", "background");
-		this.element_background.setAttribute("src", "img/background_hud.gif");
+		this.element_background.setAttribute("src", data.images["background"].src);
 		css_box(this.element_background, box);
 		parent.appendChild(this.element_background);
 	}
@@ -430,7 +480,7 @@ class game {
 						for(let c in chain)
 							if(segments[s][0] == chain[c][0] && segments[s][1] == chain[c][1]) {
 								if(effects)
-									new effect(this.element, [segments[s][0], segments[s][1] + this.settings.previews + DISPLAY_GAME_PADDING, this.settings.resolution], this.settings.resolution, "effect_clear", 0.5);
+									new effect(this.element, [segments[s][0] + this.settings_item.offset[0], segments[s][1] + this.settings_item.offset[1]], this.settings.resolution, "effect_clear", 0.5);
 								continue segments;
 							}
 						spawn.push(segments[s]);
@@ -492,29 +542,24 @@ class game {
 		if(this.status(targets[1], 1))
 			return;
 
-		// Apply gravity and item status effects, if the active item landed deactivate it
+		// Apply gravity and other item status effects
 		// Game over: Lose if the active item landed while still at its spawn row
 		var has_active = false;
 		for(let i in this.items) {
-			this.items[i].move([0, 1], 0, false);
-			if(this.items[i].active && this.items[i].sitting()) {
-				this.items[i].active = false;
-				if(this.items[i].position[1] == 0)
-					return this.game_end(false);
+			// Status 2 & 3: Convert 1 x 1 items to or from a target and normal item if they're below the target spawn height
+			if(this.items[i].position[1] >= this.settings.target_height) {
+				if(this.status(targets[2], 2) && !this.items[i].target)
+					this.items[i].set_target(true);
+				if(this.status(targets[3], 3) && this.items[i].target)
+					this.items[i].set_target(false);
 			}
-			has_active = has_active ? true : this.items[i].active;
 
-			// Status 2 & 3: Convert 1 x 1 items to or from a target and normal item
-			if(this.status(targets[2], 2) && !this.items[i].target)
-				this.items[i].set_target(true);
-			if(this.status(targets[3], 3) && this.items[i].target)
-				this.items[i].set_target(false);
-
-			// Status 4 & 5: Apply random movement and rotation, doesn't affect the active item
-			if(this.status(targets[4], 4) && !this.items[i].active)
-				this.items[i].move([0, 0], Math.random() < 0.5 ? -1 : +1, false);
-			if(this.status(targets[5], 5) && !this.items[i].active)
-				this.items[i].move([Math.random() < 0.5 ? -1 : +1, 0], 0, false);
+			// Status 4 & 5: Apply movement and rotation
+			this.items[i].move([0, 1], 0);
+			if(this.status(targets[4], 4))
+				this.items[i].move([0, 0], Math.random() < 0.5 ? -1 : +1);
+			if(this.status(targets[5], 5))
+				this.items[i].move([Math.random() < 0.5 ? -1 : +1, 0], 0);
 
 			// Status 6 & 7: Change the colors of item segments for cloning and spreading
 			const segments = this.items[i].get_segments();
@@ -524,6 +569,14 @@ class game {
 				if(this.status(targets[7], 7) && segments[s][2] != 7)
 					this.items[i].set_color(7, s);
 			}
+
+			// If the active item landed or became a target deactivate it
+			if(this.items[i].active && this.items[i].sitting()) {
+				this.items[i].active = false;
+				if(this.items[i].position[1] == 0)
+					return this.game_end(false);
+			}
+			has_active = has_active ? true : this.items[i].active;
 		}
 
 		// Clear chains and add the cleared item count as score, count is raised by the power of two to reward clearing multiple items in one go
@@ -558,26 +611,22 @@ class game {
 		if(event.repeat)
 			return;
 
-		// Convert the input to a desired offset as [x, y, angle, drop]
-		var offset = [0, 0, 0, false];
+		// Convert the input to a desired offset as [x, y, angle]
+		var offset = [0, 0, 0];
 		if(event.key == "ArrowLeft" || event.key == "a" || event.key == "A")
-			offset = [-1, 0, 0, false];
+			offset = [-1, 0, 0];
 		if(event.key == "ArrowRight" || event.key == "d" || event.key == "D")
-			offset = [+1, 0, 0, false];
+			offset = [+1, 0, 0];
 		if(event.key == "ArrowUp" || event.key == "w" || event.key == "W")
-			offset = [0, 0, +1, false];
+			offset = [0, 0, +1];
 		if(event.key == "ArrowDown" || event.key == "s" || event.key == "S")
-			offset = [0, +1, 0, true];
+			offset = [0, +1, 0];
 
-		// Apply the offset to the active item, if the item was dropped instantly deactivate and preform an update
+		// Apply the offset to the active item, if the item touched the ground instantly deactivate and preform an update
 		for(let i in this.items)
 			if(this.items[i].active) {
-				this.items[i].move([offset[0], offset[1]], offset[2], offset[3]);
-				if(offset[3]) {
-					const segments = this.items[i].get_segments();
-					for(let s in segments)
-						new effect(this.element, [segments[s][0], segments[s][1] + this.settings.previews + DISPLAY_GAME_PADDING, this.settings.resolution], this.settings.resolution, "effect_drop", 0.25);
-
+				this.items[i].move([offset[0], offset[1]], offset[2]);
+				if(this.items[i].sitting()) {
 					clearInterval(this.timer);
 					this.timer = setInterval(this.update.bind(this), this.settings.time * 1000);
 					this.items[i].active = false;
@@ -592,7 +641,7 @@ class game {
 
 		// Display gameplay instructions as well as status effects for active colors
 		if(event.key == "`") {
-			alert("Use the arrow keys or WASD to control the active item: Left and right to move, up to rotate, down to slam the item to the ground. Chain at least " + this.settings.chain + " items of the same color to clear a line, remove all targets to advance. Different colors induce different effects, active statuses as follows...");
+			alert("Use the arrow keys or WASD to control the active item: Left and right to move, up to rotate, down to lower the item faster. Chain at least " + this.settings.chain + " items of the same color to clear a line, remove all targets to advance. Different colors induce different effects, active statuses as follows...");
 			if(this.settings.item_colors.includes(0))
 				alert(ITEM_COLOR[0] + " / anger: Opposite of " + ITEM_COLOR[1] + " / fear. Has a chance of " + this.settings.statuses[0] + "x per tick. Induces aggitation and increases the creature's heart rate, may introduce extra ticks causing time to flow faster than normal.");
 			if(this.settings.item_colors.includes(1))
@@ -604,7 +653,7 @@ class game {
 			if(this.settings.item_colors.includes(4))
 				alert(ITEM_COLOR[4] + " / sleep: Complementary to " + ITEM_COLOR[5] + " / excitement. Has a chance of " + this.settings.statuses[4] + "x per tick. This makes the creature sleepy and less capable of regulating their gut's flow, large pills may get squeezed in place and slip causing them to change rotation.");
 			if(this.settings.item_colors.includes(5))
-				alert(ITEM_COLOR[5] + " / excitement: Complementary to " + ITEM_COLOR[4] + " / sleep. Has a chance of " + this.settings.statuses[5] + "x per tick. Makes the creature more horny which may cause random spastic movement of the muscles, dropped pills may get thrown around the stomach and move sideways on their own.");
+				alert(ITEM_COLOR[5] + " / excitement: Complementary to " + ITEM_COLOR[4] + " / sleep. Has a chance of " + this.settings.statuses[5] + "x per tick. Makes the creature more horny which may cause random spastic movement of the muscles, pills may get thrown around the stomach and move sideways on their own.");
 			if(this.settings.item_colors.includes(6))
 				alert(ITEM_COLOR[6] + " / absorption: Reverse of " + ITEM_COLOR[7] + " / spread. Has a chance of " + this.settings.statuses[6] + "x per tick. Affects items and segments of the same color, this mysterious substance absorbs and replicates nearby substances causing its own color to transform into another color.");
 			if(this.settings.item_colors.includes(7))
@@ -617,4 +666,4 @@ let canvas = document.createElement("div");
 canvas.setAttribute("class", "canvas");
 css_box(canvas, [DISPLAY_CANVAS_BOX[0], DISPLAY_CANVAS_BOX[1], DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
 document.body.appendChild(canvas);
-new game(canvas, settings);
+data.load();
