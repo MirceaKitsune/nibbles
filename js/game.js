@@ -1,4 +1,4 @@
-// ITEM_COLOR must contain color names matching their respective image file names, should be 8 in total to match statuses
+// ITEM_COLOR must contain color names matching their respective image and sound file names, should be 8 in total to match statuses
 // ITEM_SPRITE_SEGMENT_* is based on item angle: 0 = up, 1 = right, 2 = down, 3 = left
 const DISPLAY_CANVAS_ZOOM = 3;
 const DISPLAY_CANVAS_BOX = [512, 0, 128 * DISPLAY_CANVAS_ZOOM, 256 * DISPLAY_CANVAS_ZOOM];
@@ -93,6 +93,7 @@ const settings = {
 class data {
 	static counter = 0;
 	static images = {};
+	static audio = {};
 
 	// Called with true when an asset is added and false when it finished loading, the game launches once the counter is zero
 	static count(add) {
@@ -113,11 +114,29 @@ class data {
 		};
 	}
 
+	// Load an audio asset
+	static load_audio(name) {
+		if(data.audio.hasOwnProperty(name))
+			return;
+		data.count(true);
+		data.audio[name] = new Audio();
+		data.audio[name].src = "snd/" + name + ".ogg";
+		data.audio[name].oncanplaythrough = function() {
+			data.count(false);
+		};
+	}
+
 	// Preload all assets used by the game
 	static load() {
 		data.load_image("background");
 		data.load_image("effect_clear");
 		data.load_image("effect_drop");
+		data.load_audio("tick");
+		data.load_audio("game_lost");
+		data.load_audio("game_won");
+		data.load_audio("game_continue");
+		data.load_audio("item_drop_small");
+		data.load_audio("item_drop_large");
 		for(let c in ITEM_COLOR) {
 			data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_TARGET);
 			data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SINGLE);
@@ -127,9 +146,42 @@ class data {
 				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_CENTER[t]);
 			for(let t in ITEM_SPRITE_SEGMENT_END)
 				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_END[t]);
+			data.load_audio("item_clear_" + ITEM_COLOR[c]);
 		}
 	}
 }
+
+// Static class for the audio system
+class audio {
+	static channel_sound = new Audio();
+	static busy = false;
+	static sound_default = "tick";
+	static sound = undefined;
+
+	// Setup the default channels and their settings
+	static configure() {
+		audio.channel_sound.volume = 0.5;
+		audio.channel_sound.loop = false;
+		audio.channel_sound.onended = function() {
+			audio.busy = false;
+		}
+	}
+
+	// Play a custom sound if one is scheduled, the default sound is played otherwise
+	// Custom sounds have higher priority and may interrupt any ongoing sound, the default sound has low priority and may never cut another sound
+	static play() {
+		if(audio.sound) {
+			audio.channel_sound.src = data.audio[audio.sound].src;
+			audio.channel_sound.play().catch(() => {});
+			audio.busy = true;
+		} else if(!audio.busy) {
+			audio.channel_sound.src = data.audio[audio.sound_default].src;
+			audio.channel_sound.play().catch(() => {});
+		}
+		audio.sound = undefined;
+	}
+}
+audio.configure();
 
 // Visual effect, shows for a given amount of time then removes itself
 class effect {
@@ -306,6 +358,7 @@ class item extends item_static {
 				const segments = this.get_segments();
 				for(let s in segments)
 					new effect(this.parent, [segments[s][0] + this.settings.offset[0], segments[s][1] + this.settings.offset[1]], this.settings.resolution, "effect_drop", 0.25);
+				audio.sound = segments.length == 1 ? "item_drop_small" : "item_drop_large";
 			}
 		}
 	}
@@ -400,15 +453,21 @@ class game {
 		clearInterval(this.timer);
 		this.timer = undefined;
 
-		if(success && this.level >= this.settings.levels)
+		if(success && this.level >= this.settings.levels) {
+			audio.sound = "game_won";
+			audio.play();
 			alert("Game over: You won! Thank you for playing.");
-		else if(success) {
+		} else if(success) {
+			audio.sound = "game_continue";
+			audio.play();
 			this.level++;
 			this.element_label_level.innerHTML = Math.min(this.level, DISPLAY_LABEL_LIMIT);
 			this.game_start();
-		}
-		else
+		} else {
+			audio.sound = "game_lost";
+			audio.play();
 			alert("Game over: You lost! Press the ` key for help.");
+		}
 	}
 
 	// Check if enough items of the same color exist in a straight line, returns a position list if the chain is long enough
@@ -456,6 +515,7 @@ class game {
 	// Clear items that form a chain, returns the number of items that were removed
 	chain(effects) {
 		var count = 0;
+		var type = undefined;
 		var chain = undefined;
 		while(chain = this.chain_positions(false) || this.chain_positions(true)) {
 			var remove = [];
@@ -479,6 +539,7 @@ class game {
 					for(let s in segments) {
 						for(let c in chain)
 							if(segments[s][0] == chain[c][0] && segments[s][1] == chain[c][1]) {
+								type = segments[s][2];
 								if(effects)
 									new effect(this.element, [segments[s][0] + this.settings_item.offset[0], segments[s][1] + this.settings_item.offset[1]], this.settings.resolution, "effect_clear", 0.5);
 								continue segments;
@@ -500,6 +561,9 @@ class game {
 				it.set_pos(spawn[i], 0);
 			}
 		}
+
+		if(!isNaN(type) && effects)
+			audio.sound = "item_clear_" + ITEM_COLOR[type];
 		return count;
 	}
 
@@ -604,6 +668,7 @@ class game {
 			it.set_pos([this.center, 0], 1);
 			it.active = true;
 		}
+		audio.play();
 	}
 
 	// Fires when a key is pressed
