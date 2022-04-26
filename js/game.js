@@ -16,12 +16,21 @@ function random_array(arr) {
 	return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Sets the position of an element to the given box
-function css_box(element, box) {
+// Sets the position and scale of an element
+function html_box(element, box) {
 	element.style["left"] = box[0] + "px";
 	element.style["top"] = box[1] + "px";
 	element.style["width"] = box[2] + "px";
 	element.style["height"] = box[3] + "px";
+}
+
+// Creates an HTML element with basic settings
+function html_create(parent, type, css, box) {
+	const element = document.createElement(type);
+	element.setAttribute("class", css);
+	html_box(element, box);
+	parent.appendChild(element);
+	return element;
 }
 
 // Overrides can be used to change settings when reaching a particular level, only some settings are safe to override
@@ -129,6 +138,8 @@ class data {
 	// Preload all assets used by the game
 	static load() {
 		data.load_image("background");
+		data.load_image("foreground");
+		data.load_image("foreground_eyes");
 		data.load_image("effect_clear");
 		data.load_image("effect_drop");
 		data.load_audio("tick");
@@ -138,6 +149,7 @@ class data {
 		data.load_audio("item_drop_small");
 		data.load_audio("item_drop_large");
 		for(let c in ITEM_COLOR) {
+			data.load_image("foreground_color_" + ITEM_COLOR[c]);
 			data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_TARGET);
 			data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SINGLE);
 			for(let t in ITEM_SPRITE_SEGMENT_START)
@@ -186,11 +198,8 @@ audio.configure();
 // Visual effect, shows for a given amount of time then removes itself
 class effect {
 	constructor(parent, position, resolution, image, duration) {
-		this.element = document.createElement("img");
-		this.element.setAttribute("class", "effect");
+		this.element = html_create(parent, "img", "effect", [position[0] * resolution, position[1] * resolution, resolution, resolution]);
 		this.element.setAttribute("src", data.images[image].src);
-		css_box(this.element, [position[0] * resolution, position[1] * resolution, resolution, resolution]);
-		parent.appendChild(this.element);
 		setTimeout(this.remove.bind(this), duration * 1000);
 	}
 
@@ -222,13 +231,12 @@ class item_static {
 
 	// Update the HTML element of a specific segment, create a new element if the index doesn't already exist
 	update_element(index, pos, color, type) {
-		if(!this.elements[index]) {
-			this.elements[index] = document.createElement("img");
-			this.elements[index].setAttribute("class", "item");
-			this.parent.appendChild(this.elements[index]);
-		}
+		const box = [(pos[0] + this.settings.offset[0]) * this.settings.resolution, (pos[1] + this.settings.offset[1]) * this.settings.resolution, this.settings.resolution, this.settings.resolution];
+		if(!this.elements[index])
+			this.elements[index] = html_create(this.parent, "img", "item", box);
+		else
+			html_box(this.elements[index], box);
 		this.elements[index].setAttribute("src", data.images["item_" + color + "_" + type].src);
-		css_box(this.elements[index], [(pos[0] + this.settings.offset[0]) * this.settings.resolution, (pos[1] + this.settings.offset[1]) * this.settings.resolution, this.settings.resolution, this.settings.resolution]);
 	}
 
 	// Update all segments of this item
@@ -367,11 +375,27 @@ class item extends item_static {
 // Game background, handles backdrop images and visual details
 class game_background {
 	constructor(parent, box) {
-		this.element_background = document.createElement("img");
-		this.element_background.setAttribute("class", "background");
+		this.box = box;
+
+		this.element_background = html_create(parent, "img", "background", this.box);
 		this.element_background.setAttribute("src", data.images["background"].src);
-		css_box(this.element_background, box);
-		parent.appendChild(this.element_background);
+		this.element_foreground_eyes = html_create(parent, "img", "foreground", this.box);
+		this.element_foreground_eyes.setAttribute("src", data.images["foreground_eyes"].src);
+		this.element_foreground = html_create(parent, "img", "foreground", this.box);
+		this.element_foreground.setAttribute("src", data.images["foreground"].src);
+		this.element_foreground_color = html_create(parent, "img", "foreground", this.box);
+		this.element_foreground_color.setAttribute("src", data.images["foreground_color_" + ITEM_COLOR[0]].src);
+	}
+
+	// Update the foreground color with a particular variation
+	set_foreground_color(color) {
+		if(!isNaN(color))
+			this.element_foreground_color.setAttribute("src", data.images["foreground_color_" + ITEM_COLOR[color]].src);
+	}
+
+	// Update the foreground eyes with a particular position offset
+	set_foreground_eyes(position) {
+		html_box(this.element_foreground_eyes, [this.box[0] + position[0], this.box[1] + position[1], this.box[2], this.box[3]]);
 	}
 }
 
@@ -390,24 +414,13 @@ class game {
 		this.settings_item = { "grid": this.settings.grid, "offset": [0, this.settings.previews + DISPLAY_GAME_PADDING], "resolution": this.settings.resolution };
 		this.settings_item_next = { "grid": this.settings.grid, "offset": [0, DISPLAY_GAME_PADDING], "resolution": this.settings.resolution };
 
-		this.element = document.createElement("div");
-		this.element.setAttribute("class", "game");
-		css_box(this.element, [this.settings.position[0], this.settings.position[1], this.settings.grid[0] * this.settings.resolution, (this.settings.grid[1] + this.settings.previews + DISPLAY_GAME_PADDING) * this.settings.resolution]);
-		parent.appendChild(this.element);
-
-		this.element_label_score = document.createElement("label");
-		this.element_label_score.setAttribute("class", "label label_left");
+		this.element = html_create(parent, "div", "game", [this.settings.position[0], this.settings.position[1], this.settings.grid[0] * this.settings.resolution, (this.settings.grid[1] + this.settings.previews + DISPLAY_GAME_PADDING) * this.settings.resolution]);
+		this.element_label_score = html_create(parent, "label", "label label_left", [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
 		this.element_label_score.style["font-size"] = Math.floor(this.settings.resolution / 1.5) + "px";
 		this.element_label_score.innerHTML = 0;
-		css_box(this.element_label_score, [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
-		parent.appendChild(this.element_label_score);
-
-		this.element_label_level = document.createElement("label");
-		this.element_label_level.setAttribute("class", "label label_right");
+		this.element_label_level = html_create(parent, "label", "label label_right", [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
 		this.element_label_level.style["font-size"] = Math.floor(this.settings.resolution / 1.5) + "px";
 		this.element_label_level.innerHTML = 0;
-		css_box(this.element_label_level, [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
-		parent.appendChild(this.element_label_level);
 
 		// Register key presses, the event must be the first parameter of the target function
 		document.addEventListener("keydown", this.key.bind(this), false);
@@ -446,6 +459,7 @@ class game {
 		}
 
 		this.timer = setInterval(this.update.bind(this), this.settings.time * 1000);
+		this.update();
 	}
 
 	// End the existing game
@@ -594,11 +608,21 @@ class game {
 
 	// Update function that executes every tick
 	update() {
-		// Determine the total amount of target colors present in the scene for status checks
+		// Determine the position of the active item and total amount of target colors in the scene, used for status checks and background indicators
+		var active_pos = [this.center, 0];
 		var targets = [];
-		for(let i in this.items)
+		for(let c in ITEM_COLOR)
+			targets[c] = 0;
+		for(let i in this.items) {
+			if(this.items[i].active)
+				active_pos = this.items[i].position;
 			if(this.items[i].target)
-				targets[this.items[i].colors[0]] = isNaN(targets[this.items[i].colors[0]]) ? 0 : targets[this.items[i].colors[0]] + 1;
+				targets[this.items[i].colors[0]]++;
+		}
+		const active_pos_x = Math.round(((active_pos[0] * 2) - this.settings.grid[0]) / this.settings.grid[0]) * this.settings.resolution;
+		const active_pos_y = Math.round(((active_pos[1] * 2) - this.settings.grid[1]) / this.settings.grid[1]) * this.settings.resolution;
+		this.background.set_foreground_color(targets.indexOf(Math.max(...targets)));
+		this.background.set_foreground_eyes([active_pos_x, active_pos_y]);
 
 		// Status 0 & 1: Preform an extra update or skip this tick
 		if(this.status(targets[0], 0))
@@ -727,8 +751,5 @@ class game {
 	}
 }
 
-let canvas = document.createElement("div");
-canvas.setAttribute("class", "canvas");
-css_box(canvas, [DISPLAY_CANVAS_BOX[0], DISPLAY_CANVAS_BOX[1], DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
-document.body.appendChild(canvas);
+let canvas = html_create(document.body, "div", "canvas", [DISPLAY_CANVAS_BOX[0], DISPLAY_CANVAS_BOX[1], DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
 data.load();
