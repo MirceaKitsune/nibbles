@@ -108,12 +108,14 @@ class data {
 	static counter = 0;
 	static images = {};
 	static audio = {};
+	static element_canvas = undefined;
+	static element_title = undefined;
 
 	// Called with true when an asset is added and false when it finished loading, the game launches once the counter is zero
 	static count(add) {
 		data.counter += add ? -1 : +1;
 		if(data.counter == 0)
-			new game(canvas, settings);
+			data.load_end();
 	}
 
 	// Load an image asset
@@ -167,6 +169,26 @@ class data {
 		}
 		for(let m in MUSIC)
 			data.load_audio("music/" + MUSIC[m]);
+	}
+
+	// Create the core element and title screen, the title screen isn't stored in the cache and is used to control the process
+	static load_start() {
+		data.element_canvas = html_create(document.body, "div", "canvas", [DISPLAY_CANVAS_BOX[0], DISPLAY_CANVAS_BOX[1], DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
+		data.element_title = html_create(data.element_canvas, "img", "title", [0, 0, DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
+		data.element_title.setAttribute("src", "img/title.gif");
+		data.element_title.onload = function() {
+			setTimeout(data.load, 1000);
+		}
+	}
+
+	// All data has loaded, update the title screen and wait for the player to start the game
+	static load_end() {
+		data.element_title.setAttribute("src", "img/title_loaded.gif");
+		data.element_title.onclick = function() {
+			data.element_title.remove();
+			data.element_title = undefined;
+			new game(data.element_canvas, settings);
+		}
 	}
 }
 
@@ -497,6 +519,7 @@ class game {
 			audio.play_sound();
 			audio.play_music(undefined);
 			alert("Game over: You won! Thank you for playing.");
+			location.reload();
 		} else if(success) {
 			audio.sound = "game_continue";
 			audio.play_sound();
@@ -508,6 +531,7 @@ class game {
 			audio.play_sound();
 			audio.play_music(undefined);
 			alert("Game over: You lost! Press the ` key for help.");
+			location.reload();
 		}
 	}
 
@@ -782,5 +806,4 @@ class game {
 	}
 }
 
-let canvas = html_create(document.body, "div", "canvas", [DISPLAY_CANVAS_BOX[0], DISPLAY_CANVAS_BOX[1], DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
-data.load();
+data.load_start();
