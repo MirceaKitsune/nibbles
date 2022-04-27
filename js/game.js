@@ -10,6 +10,7 @@ const ITEM_SPRITE_SINGLE = "center";
 const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
 const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
 const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
+const MUSIC = ["die_hard_battle", "biohazard", "stargazer", "a_wish_to_fulfill", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "no_stars", "start_of_rise", "a_start_to_space", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "dance_field", "zenostar", "hail_the_arbiter", "decesive_frontier"];
 
 // Returns a random entry from an array
 function random_array(arr) {
@@ -79,6 +80,9 @@ for(let i = 0; i <= 99; i++) {
 	settings_overrides.push({ "level": i, "setting": "time", "value": 1 - i / 125 });
 	settings_overrides.push({ "level": i, "setting": "target_chance", "value": 0.25 + (Math.abs(50 - i) / 50) * 0.25 });
 }
+for(let i = 0; i <= 95; i += 5)
+	// One new song every 5 levels
+	settings_overrides.push({ "level": i, "setting": "music", "value": i / 5 });
 
 // Settings prefixed with item_* are arrays of indexes, the same item can be added multiple times to influence probabilities
 const settings = {
@@ -94,7 +98,8 @@ const settings = {
 	"chain": 3,
 	"item_length": [],
 	"item_colors": [],
-	"statuses": [5, 5, 2.5, 2.5, 3.75, 3.75, 1, 1],
+	"statuses": [5, 5, 0.5, 0.5, 1, 1, 0.5, 0.5],
+	"music": undefined,
 	"overrides": settings_overrides
 }
 
@@ -160,37 +165,56 @@ class data {
 				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_END[t]);
 			data.load_audio("item_clear_" + ITEM_COLOR[c]);
 		}
+		for(let m in MUSIC)
+			data.load_audio("music/" + MUSIC[m]);
 	}
 }
 
 // Static class for the audio system
 class audio {
 	static channel_sound = new Audio();
-	static busy = false;
+	static channel_music = new Audio();
+	static sound_busy = false;
 	static sound_default = "tick";
 	static sound = undefined;
 
 	// Setup the default channels and their settings
 	static configure() {
+		audio.channel_music.volume = 0.5;
+		audio.channel_music.loop = true;
 		audio.channel_sound.volume = 0.5;
 		audio.channel_sound.loop = false;
 		audio.channel_sound.onended = function() {
-			audio.busy = false;
+			audio.sound_busy = false;
 		}
 	}
 
 	// Play a custom sound if one is scheduled, the default sound is played otherwise
 	// Custom sounds have higher priority and may interrupt any ongoing sound, the default sound has low priority and may never cut another sound
-	static play() {
+	static play_sound() {
 		if(audio.sound) {
-			audio.channel_sound.src = data.audio[audio.sound].src;
+			if(audio.channel_sound.src != data.audio[audio.sound].src)
+				audio.channel_sound.src = data.audio[audio.sound].src;
 			audio.channel_sound.play().catch(() => {});
-			audio.busy = true;
-		} else if(!audio.busy) {
-			audio.channel_sound.src = data.audio[audio.sound_default].src;
+			audio.sound_busy = true;
+		} else if(!audio.sound_busy) {
+			if(audio.channel_sound.src != data.audio[audio.sound_default].src)
+				audio.channel_sound.src = data.audio[audio.sound_default].src;
 			audio.channel_sound.play().catch(() => {});
 		}
 		audio.sound = undefined;
+	}
+
+	// Loop the given song, the value must be an index in the music object or undefined to stop the song
+	static play_music(index) {
+		if(!isNaN(index)) {
+			const name = "music/" + MUSIC[index];
+			if(audio.channel_music.src != data.audio[name].src)
+				audio.channel_music.src = data.audio[name].src;
+			if(audio.channel_music.paused)
+				audio.channel_music.play().catch(() => {});
+		} else
+			audio.channel_music.pause();
 	}
 }
 audio.configure();
@@ -458,6 +482,7 @@ class game {
 			this.chain(false);
 		}
 
+		audio.play_music(this.settings.music);
 		this.timer = setInterval(this.update.bind(this), this.settings.time * 1000);
 		this.update();
 	}
@@ -469,17 +494,19 @@ class game {
 
 		if(success && this.level >= this.settings.levels) {
 			audio.sound = "game_won";
-			audio.play();
+			audio.play_sound();
+			audio.play_music(undefined);
 			alert("Game over: You won! Thank you for playing.");
 		} else if(success) {
 			audio.sound = "game_continue";
-			audio.play();
+			audio.play_sound();
 			this.level++;
 			this.element_label_level.innerHTML = Math.min(this.level, DISPLAY_LABEL_LIMIT);
 			this.game_start();
 		} else {
 			audio.sound = "game_lost";
-			audio.play();
+			audio.play_sound();
+			audio.play_music(undefined);
 			alert("Game over: You lost! Press the ` key for help.");
 		}
 	}
@@ -608,6 +635,9 @@ class game {
 
 	// Update function that executes every tick
 	update() {
+		if(!this.timer || !document.hasFocus())
+			return;
+
 		// Determine the position of the active item and total amount of target colors in the scene, used for status checks and background indicators
 		var active_pos = [this.center, 0];
 		var targets = [];
@@ -692,12 +722,13 @@ class game {
 			it.set_pos([this.center, 0], 1);
 			it.active = true;
 		}
-		audio.play();
+
+		audio.play_sound();
 	}
 
 	// Fires when a key is pressed
 	key(event) {
-		if(event.repeat)
+		if(event.repeat || !document.hasFocus())
 			return;
 
 		// Convert the input to a desired offset as [x, y, angle]
