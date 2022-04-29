@@ -87,6 +87,7 @@ for(let i = 0; i <= 95; i += 5)
 // Settings prefixed with item_* are arrays of indexes, the same item can be added multiple times to influence probabilities
 const settings = {
 	"background": [DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]],
+	"background_look": 4 * DISPLAY_CANVAS_ZOOM,
 	"position": [32 * DISPLAY_CANVAS_ZOOM, 64 * DISPLAY_CANVAS_ZOOM],
 	"grid": [8, 16],
 	"resolution": 8 * DISPLAY_CANVAS_ZOOM,
@@ -673,8 +674,8 @@ class game {
 			if(this.items[i].target)
 				targets[this.items[i].colors[0]]++;
 		}
-		const active_pos_x = Math.round(((active_pos[0] * 2) - this.settings.grid[0]) / this.settings.grid[0]) * this.settings.resolution;
-		const active_pos_y = Math.round(((active_pos[1] * 2) - this.settings.grid[1]) / this.settings.grid[1]) * this.settings.resolution;
+		const active_pos_x = Math.round(((active_pos[0] * 2) - this.settings.grid[0]) / this.settings.grid[0]) * this.settings.background_look;
+		const active_pos_y = Math.round(((active_pos[1] * 2) - this.settings.grid[1]) / this.settings.grid[1]) * this.settings.background_look;
 		this.background.set_foreground_color(targets.indexOf(Math.max(...targets)));
 		this.background.set_foreground_eyes([active_pos_x, active_pos_y]);
 
