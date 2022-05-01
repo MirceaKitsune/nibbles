@@ -147,6 +147,7 @@ class data {
 	static load() {
 		data.load_image("background");
 		data.load_image("foreground");
+		data.load_image("eyes");
 		data.load_image("effect_clear");
 		data.load_image("effect_drop");
 		data.load_audio("tick");
@@ -156,8 +157,8 @@ class data {
 		data.load_audio("item_drop_small");
 		data.load_audio("item_drop_large");
 		for(let c in ITEM_COLOR) {
-			data.load_image("foreground_color_" + ITEM_COLOR[c]);
-			data.load_image("foreground_eyes_" + ITEM_COLOR[c]);
+			data.load_image("foreground_" + ITEM_COLOR[c]);
+			data.load_image("eyes_" + ITEM_COLOR[c]);
 			data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_TARGET);
 			data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SINGLE);
 			for(let t in ITEM_SPRITE_SEGMENT_START)
@@ -426,28 +427,26 @@ class game_background {
 
 		this.element_background = html_create(parent, "img", "background", this.box);
 		this.element_background.setAttribute("src", data.images["background"].src);
-		this.element_foreground_eyes = html_create(parent, "img", "foreground", this.box);
-		this.element_foreground_eyes.setAttribute("src", data.images["foreground_eyes_" + ITEM_COLOR[0]].src);
+		this.element_eyes = html_create(parent, "img", "foreground", this.box);
+		this.element_eyes.setAttribute("src", data.images["eyes"].src);
 		this.element_foreground = html_create(parent, "img", "foreground", this.box);
 		this.element_foreground.setAttribute("src", data.images["foreground"].src);
-		this.element_foreground_color = html_create(parent, "img", "foreground", this.box);
-		this.element_foreground_color.setAttribute("src", data.images["foreground_color_" + ITEM_COLOR[0]].src);
 	}
 
 	// Update the foreground color with a particular variation and choose if it should show
-	set_foreground_color(color, show) {
+	set_foreground(color, show) {
 		if(isNaN(color))
 			return;
-		this.element_foreground_color.setAttribute("src", data.images["foreground_color_" + ITEM_COLOR[color]].src);
-		this.element_foreground_color.style["display"] = show ? "block" : "none";
+		this.element_foreground.setAttribute("src", data.images["foreground_" + ITEM_COLOR[color]].src);
+		this.element_foreground.style["display"] = show ? "block" : "none";
 	}
 
 	// Update the foreground eyes with a particular color and position offset
-	set_foreground_eyes(color, position) {
+	set_eyes(color, position) {
 		if(isNaN(color))
 			return;
-		this.element_foreground_eyes.setAttribute("src", data.images["foreground_eyes_" + ITEM_COLOR[color]].src);
-		html_box(this.element_foreground_eyes, [this.box[0] + position[0], this.box[1] + position[1], this.box[2], this.box[3]]);
+		this.element_eyes.setAttribute("src", data.images["eyes_" + ITEM_COLOR[color]].src);
+		html_box(this.element_eyes, [this.box[0] + position[0], this.box[1] + position[1], this.box[2], this.box[3]]);
 	}
 }
 
@@ -682,8 +681,8 @@ class game {
 		const color = targets.indexOf(Math.max(...targets));
 		const active_pos_x = Math.round(((active_pos[0] * 2) - this.settings.grid[0]) / this.settings.grid[0]) * this.settings.background_look;
 		const active_pos_y = Math.round(((active_pos[1] * 2) - this.settings.grid[1]) / this.settings.grid[1]) * this.settings.background_look;
-		this.background.set_foreground_color(color, targets[color] > 1);
-		this.background.set_foreground_eyes(color, [active_pos_x, active_pos_y]);
+		this.background.set_foreground(color, targets[color] > 1);
+		this.background.set_eyes(color, [active_pos_x, active_pos_y]);
 
 		// Status 0 & 1: Preform an extra update or skip this tick
 		if(this.status(targets[0], 0))
