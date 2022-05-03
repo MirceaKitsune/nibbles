@@ -10,7 +10,7 @@ const ITEM_SPRITE_SINGLE = "center";
 const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
 const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
 const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
-const MUSIC = ["die_hard_battle", "biohazard", "stargazer", "a_wish_to_fulfill", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "no_stars", "start_of_rise", "a_start_to_space", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "dance_field", "zenostar", "hail_the_arbiter", "decesive_frontier"];
+const MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "hail_the_arbiter_metal"];
 
 // Character name is fixed, player name can be set via URL parameter
 // Nightmare mode is unlocked when the player uses the same name as the main character
@@ -316,7 +316,10 @@ class item_static {
 			this.elements[index] = html_create(this.parent, "img", "item", box);
 		else
 			html_box(this.elements[index], box);
-		this.elements[index].setAttribute("src", data.images["item_" + color + "_" + type].src);
+
+		const src = data.images["item_" + color + "_" + type].src;
+		if(this.elements[index].getAttribute("src") != src)
+			this.elements[index].setAttribute("src", src);
 	}
 
 	// Update all segments of this item
@@ -466,18 +469,16 @@ class game_background {
 
 	// Update the foreground with a particular color
 	set_foreground(color) {
-		if(isNaN(color))
-			this.element_foreground.setAttribute("src", data.images["foreground"].src);
-		else
-			this.element_foreground.setAttribute("src", data.images["foreground_" + ITEM_COLOR[color]].src);
+		const src = isNaN(color) ? data.images["foreground"].src : data.images["foreground_" + ITEM_COLOR[color]].src;
+		if(this.element_foreground.getAttribute("src") != src)
+			this.element_foreground.setAttribute("src", src);
 	}
 
 	// Update the eyes with a particular color and position offset
 	set_eyes(color, position) {
-		if(isNaN(color))
-			this.element_eyes.setAttribute("src", data.images["eyes"].src);
-		else
-			this.element_eyes.setAttribute("src", data.images["eyes_" + ITEM_COLOR[color]].src);
+		const src = isNaN(color) ? data.images["eyes"].src : data.images["eyes_" + ITEM_COLOR[color]].src;
+		if(this.element_eyes.getAttribute("src") != src)
+			this.element_eyes.setAttribute("src", src);
 		html_box(this.element_eyes, [this.box[0] + position[0], this.box[1] + position[1], this.box[2], this.box[3]]);
 	}
 }
