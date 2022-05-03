@@ -1,24 +1,3 @@
-// ITEM_COLOR must contain color names matching their respective image and sound file names, should be 8 in total to match statuses
-// ITEM_SPRITE_SEGMENT_* is based on item angle: 0 = up, 1 = right, 2 = down, 3 = left
-const DISPLAY_CANVAS_ZOOM = 3;
-const DISPLAY_CANVAS_BOX = [512, 0, 128 * DISPLAY_CANVAS_ZOOM, 256 * DISPLAY_CANVAS_ZOOM];
-const DISPLAY_GAME_PADDING = 2;
-const DISPLAY_LABEL_LIMIT = 9999;
-const ITEM_COLOR = ["red", "yellow", "green", "cyan", "blue", "pink", "white", "black"];
-const ITEM_SPRITE_TARGET = "target";
-const ITEM_SPRITE_SINGLE = "center";
-const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
-const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
-const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
-const MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "hail_the_arbiter_metal"];
-
-// Character name is fixed, player name can be set via URL parameter
-// Nightmare mode is unlocked when the player uses the same name as the main character
-const NAME_CHARACTER = "Nibbles";
-const NAME_PLAYER = window.location.hash.substring(1) || "Player";
-if(!window.location.hash)
-	alert("Warning: No name set, you will be called " + NAME_PLAYER + ". To set a custom name add the # symbol followed by your desired name at the end of the URL, eg: #Bob");
-
 // Returns a random entry from an array
 function random_array(arr) {
 	return arr[Math.floor(Math.random() * arr.length)];
@@ -41,85 +20,11 @@ function html_create(parent, type, css, box) {
 	return element;
 }
 
-// Overrides can be used to change settings when reaching a particular level, only some settings are safe to override
-var settings_overrides = [
-	// Warmup cycle: 2x pills, 2 colors max
-	{ "level": 0, "setting": "item_length", "value": [2] },
-	{ "level": 0, "setting": "item_colors", "value": [0, 1] },
-	// 1st cycle: 2x pills, 3 colors max
-	{ "level": 5, "setting": "item_length", "value": [2] },
-	{ "level": 5, "setting": "item_colors", "value": [0, 0, 0, 1, 1, 2] },
-	{ "level": 10, "setting": "item_colors", "value": [1, 1, 1, 2, 2, 3] },
-	{ "level": 15, "setting": "item_colors", "value": [2, 2, 2, 3, 3, 4] },
-	{ "level": 20, "setting": "item_colors", "value": [3, 3, 3, 4, 4, 5] },
-	// 2nd cycle: 1x - 2x pills, 4 colors max
-	{ "level": 25, "setting": "item_length", "value": [1, 2, 2] },
-	{ "level": 30, "setting": "item_colors", "value": [4, 4, 4, 4, 5, 5, 5, 0, 0, 1] },
-	{ "level": 35, "setting": "item_colors", "value": [5, 5, 5, 5, 0, 0, 0, 1, 1, 2] },
-	{ "level": 40, "setting": "item_colors", "value": [0, 0, 0, 0, 1, 1, 1, 2, 2, 3] },
-	{ "level": 45, "setting": "item_colors", "value": [1, 1, 1, 1, 2, 2, 2, 3, 3, 4] },
-	{ "level": 50, "setting": "item_colors", "value": [2, 2, 2, 2, 3, 3, 3, 4, 4, 5] },
-	// 3rd cycle: 1x - 3x pills, 3 colors max
-	{ "level": 55, "setting": "item_length", "value": [1, 2, 2, 3] },
-	{ "level": 60, "setting": "item_colors", "value": [0, 0, 0, 2, 2, 4] },
-	{ "level": 65, "setting": "item_colors", "value": [1, 1, 1, 3, 3, 5] },
-	{ "level": 70, "setting": "item_colors", "value": [2, 2, 2, 4, 4, 0] },
-	{ "level": 75, "setting": "item_colors", "value": [3, 3, 3, 5, 5, 1] },
-	{ "level": 80, "setting": "item_colors", "value": [4, 4, 4, 0, 0, 2] },
-	{ "level": 85, "setting": "item_colors", "value": [5, 5, 5, 1, 1, 3] },
-	// Final cycle: 2x - 3x pills, 3 colors max
-	{ "level": 90, "setting": "item_length", "value": [1, 2] },
-	{ "level": 95, "setting": "item_length", "value": [2, 3] },
-	{ "level": 90, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), Math.floor(Math.random() * 6), 6] },
-	{ "level": 91, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), Math.floor(Math.random() * 6), 6] },
-	{ "level": 92, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), Math.floor(Math.random() * 6), 6] },
-	{ "level": 93, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), Math.floor(Math.random() * 6), 6] },
-	{ "level": 94, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), Math.floor(Math.random() * 6), 6] },
-	{ "level": 95, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), 6] },
-	{ "level": 96, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), 6] },
-	{ "level": 97, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), 6] },
-	{ "level": 98, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), 6] },
-	{ "level": 99, "setting": "item_colors", "value": [Math.floor(Math.random() * 6), 6] }
-];
-for(let i = 0; i <= 99; i++) {
-	// Tick rate ranges from 1.0 to 0.2 for 100 levels
-	// Target chance ranges from 0.5 to 0.25: For the best difficulty curve it peaks at level 50 then decreases again
-	settings_overrides.push({ "level": i, "setting": "time", "value": 1 - i / 125 });
-	settings_overrides.push({ "level": i, "setting": "target_chance", "value": 0.25 + (Math.abs(50 - i) / 50) * 0.25 });
-}
-for(let i = 0; i <= 95; i += 5)
-	// One new song every 5 levels
-	settings_overrides.push({ "level": i, "setting": "music", "value": i / 5 });
-
-// Settings prefixed with item_* are arrays of indexes, the same item can be added multiple times to influence probabilities
-// item_length_* fields are added to their respective settings when nightmare mode is active
-const settings = {
-	"background": [DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]],
-	"background_look": 4 * DISPLAY_CANVAS_ZOOM,
-	"position": [32 * DISPLAY_CANVAS_ZOOM, 64 * DISPLAY_CANVAS_ZOOM],
-	"grid": [8, 16],
-	"resolution": 8 * DISPLAY_CANVAS_ZOOM,
-	"levels": 99,
-	"previews": 2,
-	"target_chance": 0.25,
-	"target_height": 8,
-	"time": 1,
-	"chain": 3,
-	"item_length": [],
-	"item_colors": [],
-	"item_length_nightmare": [3, 4],
-	"item_colors_nightmare": [7],
-	"statuses": [5, 5, 0.5, 0.5, 1, 1, 0.5, 0.5],
-	"music": undefined,
-	"overrides": settings_overrides
-}
-
 // Static class used to load and read assets universally
 class data {
 	static counter = 0;
 	static images = {};
 	static audio = {};
-	static nightmare = false;
 	static element_canvas = undefined;
 	static element_title = undefined;
 
@@ -186,7 +91,6 @@ class data {
 
 	// Create the core element and title screen, the title screen isn't stored in the cache and is used to control the process
 	static load_start() {
-		data.nightmare = NAME_CHARACTER.toLowerCase() == NAME_PLAYER.toLowerCase();
 		data.element_canvas = html_create(document.body, "div", "canvas", [DISPLAY_CANVAS_BOX[0], DISPLAY_CANVAS_BOX[1], DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
 		data.element_title = html_create(data.element_canvas, "img", "title", [0, 0, DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
 		data.element_title.setAttribute("src", "img/title.gif");
@@ -198,26 +102,31 @@ class data {
 	// Key actions for the title screen
 	static load_end_key() {
 		var difficulty = undefined;
-		if((event.key == "ArrowLeft" || event.key == "a" || event.key == "A") && !data.nightmare)
+		if((event.key == "ArrowLeft" || event.key == "a" || event.key == "A") && !NIGHTMARE)
 			difficulty = 0.5;
-		if((event.key == "ArrowRight" || event.key == "d" || event.key == "D") && !data.nightmare)
+		if((event.key == "ArrowRight" || event.key == "d" || event.key == "D") && !NIGHTMARE)
 			difficulty = 1.5;
-		if((event.key == "ArrowUp" || event.key == "w" || event.key == "W") && !data.nightmare)
+		if((event.key == "ArrowUp" || event.key == "w" || event.key == "W") && !NIGHTMARE)
 			difficulty = 1;
-		if((event.key == "ArrowDown" || event.key == "s" || event.key == "S") && data.nightmare)
+		if((event.key == "ArrowDown" || event.key == "s" || event.key == "S") && NIGHTMARE)
 			difficulty = 2;
 
 		if(!isNaN(difficulty)) {
+			if(NIGHTMARE)
+				window.location.hash = "Error";
+			if(!window.location.hash)
+				alert("Warning: No name set, you will be called " + NAME_PLAYER + ". To set a custom name add the # symbol followed by your desired name at the end of the URL, eg: #Bob");
+
 			document.removeEventListener("keydown", data.load_end_key, false);
 			data.element_title.remove();
 			data.element_title = undefined;
-			new game(data.element_canvas, settings, difficulty);
+			new game(data.element_canvas, SETTINGS, difficulty);
 		}
 	}
 
 	// All data has loaded, update the title screen and wait for the player to start the game
 	static load_end() {
-		if(data.nightmare)
+		if(NIGHTMARE)
 			data.element_title.setAttribute("src", "img/title_loaded_nightmare.gif");
 		else
 			data.element_title.setAttribute("src", "img/title_loaded.gif");
@@ -467,6 +376,12 @@ class game_background {
 		this.element_foreground.setAttribute("src", data.images["foreground"].src);
 	}
 
+	remove() {
+		this.element_background.remove();
+		this.element_eyes.remove();
+		this.element_foreground.remove();
+	}
+
 	// Update the foreground with a particular color
 	set_foreground(color) {
 		const src = isNaN(color) ? data.images["foreground"].src : data.images["foreground_" + ITEM_COLOR[color]].src;
@@ -493,6 +408,7 @@ class game {
 		this.items = [];
 		this.items_next = [];
 		this.timer = undefined;
+		this.timer_interval = 0;
 
 		this.background = new game_background(parent, [0, 0, this.settings.background[0], this.settings.background[1]]);
 		this.center = Math.floor((this.settings.grid[0] - 1) / 2);
@@ -511,18 +427,26 @@ class game {
 		document.addEventListener("keydown", this.key.bind(this), false);
 		this.game_start();
 	}
+	
+	remove() {
+		clearInterval(this.timer);
+		this.timer = undefined;
+
+		this.background.remove();
+		this.element.remove();
+		this.element_label_score.remove();
+		this.element_label_level.remove();
+		audio.play_music(undefined, 1);
+		document.removeEventListener("keydown", this.key.bind(this), false);
+	}
 
 	// Start a new game
 	game_start() {
-		// Apply level and difficulty overrides to the settings
+		// Apply level overrides to the settings
 		for(let i in this.settings.overrides) {
 			const override = this.settings.overrides[i];
 			if(this.level >= override.level)
 				this.settings[override.setting] = override.value;
-		}
-		if(this.difficulty >= 2) {
-			this.settings.item_colors = this.settings.item_colors.concat(this.settings.item_colors_nightmare);
-			this.settings.item_length = this.settings.item_length.concat(this.settings.item_length_nightmare);
 		}
 
 		// Clear the grid of existing items and prepare the upcoming ones
@@ -547,8 +471,9 @@ class game {
 			this.chain(false);
 		}
 
-		audio.play_music(this.settings.music, this.difficulty >= 2 ? 0.5 : 1);
-		this.timer = setInterval(this.update.bind(this), this.settings.time / this.difficulty * 1000);
+		audio.play_music(this.settings.music, NIGHTMARE ? 0.5 : 1);
+		this.timer_interval = Math.max(this.settings.time / this.difficulty * 1000, 1);
+		this.timer = setInterval(this.update.bind(this), this.timer_interval);
 		this.update();
 	}
 
@@ -561,10 +486,10 @@ class game {
 			audio.sound = "game_won";
 			audio.play_sound();
 			audio.play_music(undefined, 1);
-			if(this.difficulty >= 2)
+			if(NIGHTMARE)
 				alert("Game over: You did the impossible!");
 			else
-				alert("Game over: You won! Thank you for playing. " + NAME_CHARACTER + " appreciates that you didn't misuse his name.");
+				alert("Game over: You won! Thank you for playing, " + NAME_PLAYER + "... " + NAME_CHARACTER + " appreciates that you didn't misuse his name.");
 			location.reload();
 		} else if(success) {
 			audio.sound = "game_continue";
@@ -698,9 +623,9 @@ class game {
 		return segments;
 	}
 
-	// Return the random probability of a status effect for the given color and count
-	status(count, index) {
-		return (count / (this.settings.grid[0] * this.settings.grid[1])) * this.settings.statuses[index] * this.difficulty > Math.random();
+	// Random activation of a status effect for the given color and count, probability accounts for tick rate
+	update_status(count, index) {
+		return (count / (this.settings.grid[0] * this.settings.grid[1])) * this.settings.statuses[index] * (this.timer_interval / 1000) * this.difficulty > Math.random();
 	}
 
 	// Update function that executes every tick
@@ -726,63 +651,61 @@ class game {
 		this.background.set_eyes(color, [active_pos_x, active_pos_y]);
 
 		// Status 0 & 1: Preform an extra update or skip this tick
-		if(this.status(targets[0], 0))
+		if(this.update_status(targets[0], 0))
 			this.update();
-		if(this.status(targets[1], 1))
+		if(this.update_status(targets[1], 1))
 			return;
 
-		// Apply gravity and other item status effects
-		// Game over: Lose if the active item landed while still at its spawn row
-		var has_active = false;
+		// Handle item movement and status effects
+		const float = this.update_status(targets[4], 4);
 		for(let i in this.items) {
 			// Status 2 & 3: Convert 1 x 1 items to or from a target and normal item if they're below the target spawn height
 			if(this.items[i].position[1] >= this.settings.target_height) {
-				if(this.status(targets[2], 2) && !this.items[i].target)
+				if(this.update_status(targets[2], 2) && !this.items[i].target)
 					this.items[i].set_target(true);
-				if(this.status(targets[3], 3) && this.items[i].target)
+				if(this.update_status(targets[3], 3) && this.items[i].target)
 					this.items[i].set_target(false);
 			}
 
-			// Status 4 & 5: Apply movement and rotation
-			this.items[i].move([0, 1], 0);
-			if(this.status(targets[4], 4))
-				this.items[i].move([0, 0], Math.random() < 0.5 ? -1 : +1);
-			if(this.status(targets[5], 5))
+			// Status 4 & 5: Apply gravity and random movements
+			this.items[i].move([0, float ? -1 : +1], 0);
+			if(this.update_status(targets[5], 5))
 				this.items[i].move([Math.random() < 0.5 ? -1 : +1, 0], 0);
 
 			// Status 6 & 7: Change the colors of item segments for cloning and spreading
 			const segments = this.items[i].get_segments();
 			for(let s in segments) {
-				if(this.status(targets[6], 6) && segments[s][2] == 6)
+				if(this.update_status(targets[6], 6) && segments[s][2] == 6)
 					this.items[i].set_color(random_array(this.settings.item_colors), s);
-				if(this.status(targets[7], 7) && segments[s][2] != 7)
+				if(this.update_status(targets[7], 7) && segments[s][2] != 7)
 					this.items[i].set_color(7, s);
 			}
 
 			// If the active item landed or became a target deactivate it
-			if(this.items[i].active && this.items[i].sitting()) {
+			if(this.items[i].active && this.items[i].sitting())
 				this.items[i].active = false;
-				if(this.items[i].position[1] == 0)
-					return this.game_end(false);
-			}
-			has_active = has_active ? true : this.items[i].active;
 		}
 
 		// Clear chains and add the cleared item count as score, count is raised by the power of two to reward clearing multiple items in one go
-		this.score += 1 + this.chain(true) ** 2;
+		this.score += 1 + Math.floor((this.chain(true) ** 2) / this.settings.chain);
 		this.element_label_score.innerHTML = Math.min(this.score, DISPLAY_LABEL_LIMIT);
 
 		// Game over: Win if no target items are left
+		var has_active = false;
 		var has_target = false;
-		for(let i in this.items)
-			if(this.items[i].target) {
+		for(let i in this.items) {
+			if(this.items[i].target)
 				has_target = true;
+			if(this.items[i].active)
+				has_active = true;
+			if(this.items[i].target && this.items[i].active)
 				break;
-			}
+		}
 		if(!has_target)
 			return this.game_end(true);
 
 		// If there's no active item, get the colors of the next item and spawn one
+		// Game over: Lose if the active item collides right after being spawned
 		if(!has_active) {
 			var colors = [];
 			const segments = this.next();
@@ -792,6 +715,11 @@ class game {
 			const it = new item(this.element, this.items, this.settings_item, colors);
 			it.set_pos([this.center, 0], 1);
 			it.active = true;
+
+			if(it.collides([it.position[0], it.position[1]], it.angle)) {
+				it.remove();
+				return this.game_end(false);
+			}
 		}
 
 		audio.play_sound();
@@ -799,7 +727,7 @@ class game {
 
 	// Fires when a key is pressed
 	key(event) {
-		if(event.repeat || !document.hasFocus())
+		if(!this.timer || !document.hasFocus() || event.repeat)
 			return;
 
 		// Convert the input to a desired offset as [x, y, angle]
@@ -819,23 +747,26 @@ class game {
 				this.items[i].move([offset[0], offset[1]], offset[2]);
 				if(this.items[i].sitting()) {
 					clearInterval(this.timer);
-					this.timer = setInterval(this.update.bind(this), this.settings.time / this.difficulty * 1000);
+					this.timer = setInterval(this.update.bind(this), this.timer_interval);
 					this.items[i].active = false;
 					this.update();
 				}
 				break;
 			}
 
-		// Cheat to instantly jump to the next level, disabled in nightmare mode
-		if(event.key == "Backspace" && this.difficulty < 2)
-			this.game_end(true);
+		// Cheat to jump to the next level, in nightmare mode this is disabled and will close the game instead
+		if(event.key == "Backspace")
+			if(NIGHTMARE)
+				window.close();
+			else
+				this.game_end(true);
 
 		// Display gameplay instructions as well as status effects for active colors
 		if(event.key == "`") {
-			if(this.difficulty >= 2)
-				alert("Congratulations: You found your way into nightmare mode! Tick rate and status effect frequency is doubled, extra colors and item sizes are added, cheats are disabled. Unless you're a masochist you better not hope to win this. Active statuses as follows...");
+			if(NIGHTMARE)
+				alert("Error: The game has encountered a paradox and may not work properly, expect unpredictable results. Unless you're a masochist you better not hope to win this. Active statuses as follows...");
 			else
-				alert("Use the arrow keys or WASD to control the active item: Left and right to move, up to rotate, down to lower the item faster. Chain at least " + this.settings.chain + " items of the same color to clear a line, remove all targets to advance. Different colors induce different effects, active statuses as follows...");
+				alert("Use the arrow keys or WASD to control the active item: Left and right to move, up to rotate, down to lower the item faster. Can you beat all " + this.settings.levels + " levels and escape? Chain at least " + this.settings.chain + " items of the same color to clear a line, remove all targets to advance. Different colors induce different effects, active statuses as follows...");
 
 			if(this.settings.item_colors.includes(0))
 				alert(ITEM_COLOR[0] + " / anger: Opposite of " + ITEM_COLOR[1] + " / fear. Has a chance of " + this.settings.statuses[0] + "x per tick. Induces aggitation and increases the creature's heart rate, may introduce extra ticks causing time to flow faster than normal.");
@@ -846,7 +777,7 @@ class game {
 			if(this.settings.item_colors.includes(3))
 				alert(ITEM_COLOR[3] + " / serenity: Opposite of " + ITEM_COLOR[2] + " / nausea. Has a chance of " + this.settings.statuses[3] + "x per tick. Induces a state of calm thus helping the creature's own immune system, targets may automatically become neutralized and turn into 1 x 1 sized pills of the same color.");
 			if(this.settings.item_colors.includes(4))
-				alert(ITEM_COLOR[4] + " / sleep: Complementary to " + ITEM_COLOR[5] + " / excitement. Has a chance of " + this.settings.statuses[4] + "x per tick. This makes the creature sleepy and less capable of regulating their gut's flow, large pills may get squeezed in place and slip causing them to change rotation.");
+				alert(ITEM_COLOR[4] + " / sleep: Complementary to " + ITEM_COLOR[5] + " / excitement. Has a chance of " + this.settings.statuses[4] + "x per tick. This makes the creature sleepy and tempted to lay down, items in the stomach will sometimes float upward instead of falling down normally.");
 			if(this.settings.item_colors.includes(5))
 				alert(ITEM_COLOR[5] + " / excitement: Complementary to " + ITEM_COLOR[4] + " / sleep. Has a chance of " + this.settings.statuses[5] + "x per tick. Makes the creature more horny which may cause random spastic movement of the muscles, pills may get thrown around the stomach and move sideways on their own.");
 			if(this.settings.item_colors.includes(6))
