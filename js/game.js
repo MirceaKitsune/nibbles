@@ -61,7 +61,10 @@ class data {
 
 	// Preload all assets used by the game
 	static load() {
-		data.load_image("background");
+		data.load_image("background_easy");
+		data.load_image("background_medium");
+		data.load_image("background_hard");
+		data.load_image("background_nightmare");
 		data.load_image("foreground");
 		data.load_image("eyes");
 		data.load_image("effect_clear");
@@ -363,10 +366,11 @@ class item extends item_static {
 
 // Game background, handles backdrop images and visual details
 class game_background {
-	constructor(parent, box) {
+	constructor(parent, box, difficulty) {
+		const background = BACKGROUNDS[Math.floor(difficulty * 2) - 1];
 		this.box = box;
 		this.element_background = html_create(parent, "img", "background", this.box);
-		this.element_background.setAttribute("src", data.images["background"].src);
+		this.element_background.setAttribute("src", data.images["background_" + background].src);
 		this.element_eyes = html_create(parent, "img", "foreground", this.box);
 		this.element_eyes.setAttribute("src", data.images["eyes"].src);
 		this.element_foreground = html_create(parent, "img", "foreground", this.box);
@@ -407,7 +411,7 @@ class game {
 		this.timer = undefined;
 		this.timer_interval = 0;
 
-		this.background = new game_background(parent, [0, 0, this.settings.background[0], this.settings.background[1]]);
+		this.background = new game_background(parent, [0, 0, this.settings.background[0], this.settings.background[1]], this.difficulty);
 		this.center = Math.floor((this.settings.grid[0] - 1) / 2);
 		this.settings_item = { "grid": this.settings.grid, "offset": [0, this.settings.previews + DISPLAY_GAME_PADDING], "resolution": this.settings.resolution };
 		this.settings_item_next = { "grid": this.settings.grid, "offset": [0, DISPLAY_GAME_PADDING], "resolution": this.settings.resolution };

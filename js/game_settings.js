@@ -1,5 +1,6 @@
 // ITEM_COLOR must contain color names matching their respective image and sound file names, should be 8 in total to match statuses
 // ITEM_SPRITE_SEGMENT_* is based on item angle: 0 = up, 1 = right, 2 = down, 3 = left
+// BACKGROUNDS represents the background names based on difficulty, 4 in total
 const DISPLAY_CANVAS_ZOOM = 3;
 const DISPLAY_CANVAS_BOX = [512, 0, 128 * DISPLAY_CANVAS_ZOOM, 256 * DISPLAY_CANVAS_ZOOM];
 const DISPLAY_GAME_PADDING = 2;
@@ -10,6 +11,7 @@ const ITEM_SPRITE_SINGLE = "center";
 const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
 const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
 const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
+const BACKGROUNDS = ["easy", "medium", "hard", "nightmare"];
 const MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "hail_the_arbiter_metal", "the_one_who_stands_distant"];
 
 // Character name is fixed, player name can be set via URL parameter
