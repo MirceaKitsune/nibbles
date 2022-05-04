@@ -10,19 +10,29 @@ const ITEM_SPRITE_SINGLE = "center";
 const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
 const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
 const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
-const MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "hail_the_arbiter_metal"];
+const MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "hail_the_arbiter_metal", "the_one_who_stands_distant"];
 
 // Character name is fixed, player name can be set via URL parameter
 // Nightmare mode is unlocked when the player uses the same name as the main character
 const NAME_CHARACTER = "Nibbles";
+const NAME_PLAYER_FALLBACK = "Selbbin";
 const NAME_PLAYER = window.location.hash.substring(1) || "Player";
-const NIGHTMARE = NAME_CHARACTER.toLowerCase() == NAME_PLAYER.toLowerCase();
+const NIGHTMARE = NAME_PLAYER.toLowerCase() == NAME_CHARACTER.toLowerCase();
+const NIGHTMARE_AFTER = NAME_PLAYER.toLowerCase() == NAME_PLAYER_FALLBACK.toLowerCase();
+if(NIGHTMARE)
+	window.location.hash = NAME_PLAYER_FALLBACK;
 
-// Helper function for setting item colors, when a color is undefined a random one used in normal stages, the last color is added in nightmare mode
+// Helper function for setting item colors, when a color is undefined a random one used during normal stages is picked, one of the colors is replaced by the last color in nightmare mode
 function get_color() {
-	var colors = NIGHTMARE ? [ITEM_COLOR.length - 1] : [];
+	var colors = [];
 	for(let i = 0; i < arguments.length; i++)
 		colors.push(!isNaN(arguments[i]) ? arguments[i] : Math.floor(Math.random() * (ITEM_COLOR.length - 2)));
+	if(NIGHTMARE) {
+		const color_replace = colors[Math.floor(Math.random() * colors.length)];
+		for(let c in colors)
+			if(colors[c] == color_replace)
+				colors[c] = ITEM_COLOR.length - 1;
+	}
 	return colors;
 }
 
@@ -65,24 +75,27 @@ var settings_overrides = [
 	// Final stage: 2x - 3x pills, 2 - 3 colors
 	{ "level": 90, "setting": "item_length", "value": get_length(1, 2) },
 	{ "level": 95, "setting": "item_length", "value": get_length(2, 3) },
-	{ "level": 90, "setting": "item_colors", "value": get_color(undefined, undefined, 6) },
-	{ "level": 91, "setting": "item_colors", "value": get_color(undefined, undefined, 6) },
-	{ "level": 92, "setting": "item_colors", "value": get_color(undefined, undefined, 6) },
-	{ "level": 93, "setting": "item_colors", "value": get_color(undefined, undefined, 6) },
-	{ "level": 94, "setting": "item_colors", "value": get_color(undefined, undefined, 6) },
-	{ "level": 95, "setting": "item_colors", "value": get_color(undefined, 6) },
-	{ "level": 96, "setting": "item_colors", "value": get_color(undefined, 6) },
-	{ "level": 97, "setting": "item_colors", "value": get_color(undefined, 6) },
-	{ "level": 98, "setting": "item_colors", "value": get_color(undefined, 6) },
-	{ "level": 99, "setting": "item_colors", "value": get_color(undefined, 6) }
+	{ "level": 90, "setting": "item_colors", "value": get_color(undefined, undefined, 6, 6) },
+	{ "level": 91, "setting": "item_colors", "value": get_color(undefined, undefined, 6, 6) },
+	{ "level": 92, "setting": "item_colors", "value": get_color(undefined, undefined, 6, 6) },
+	{ "level": 93, "setting": "item_colors", "value": get_color(undefined, undefined, 6, 6) },
+	{ "level": 94, "setting": "item_colors", "value": get_color(undefined, undefined, 6, 6) },
+	{ "level": 95, "setting": "item_colors", "value": get_color(undefined, 6, 6) },
+	{ "level": 96, "setting": "item_colors", "value": get_color(undefined, 6, 6) },
+	{ "level": 97, "setting": "item_colors", "value": get_color(undefined, 6, 6) },
+	{ "level": 98, "setting": "item_colors", "value": get_color(undefined, 6, 6) },
+	{ "level": 99, "setting": "item_colors", "value": get_color(undefined, 6, 6) },
+	// Secret stage: 1x pills, 8 colors
+	{ "level": 100, "setting": "item_length", "value": get_length(1) },
+	{ "level": 100, "setting": "item_colors", "value": get_color(0, 1, 2, 3, 4, 5, 6, 7) }
 ];
-for(let i = 0; i <= 99; i++) {
+for(let i = 0; i <= 100; i++) {
 	// Tick rate ranges from 1.0 to 0.2 for 100 levels
 	// Target chance ranges from 0.5 to 0.25: For the best difficulty curve it peaks at level 50 then decreases again
-	settings_overrides.push({ "level": i, "setting": "time", "value": 1 - i / 125 });
-	settings_overrides.push({ "level": i, "setting": "target_chance", "value": 0.25 + (Math.abs(50 - i) / 50) * 0.25 });
+	settings_overrides.push({ "level": i, "setting": "time", "value": i >= 100 ? 1 : 1 - i / 125 });
+	settings_overrides.push({ "level": i, "setting": "target_chance", "value": i >= 100 ? 0 : 0.25 + (Math.abs(50 - i) / 50) * 0.25 });
 }
-for(let i = 0; i <= 95; i += 5)
+for(let i = 0; i <= 100; i += 5)
 	// One new song every 5 levels
 	settings_overrides.push({ "level": i, "setting": "music", "value": i / 5 });
 
@@ -94,7 +107,7 @@ const SETTINGS = {
 	"position": [32 * DISPLAY_CANVAS_ZOOM, 64 * DISPLAY_CANVAS_ZOOM],
 	"grid": [8, 16],
 	"resolution": 8 * DISPLAY_CANVAS_ZOOM,
-	"levels": 99,
+	"levels": NIGHTMARE_AFTER ? 100 : 99,
 	"previews": 2,
 	"target_chance": 0.25,
 	"target_height": 8,

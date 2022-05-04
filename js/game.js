@@ -112,11 +112,8 @@ class data {
 			difficulty = 2;
 
 		if(!isNaN(difficulty)) {
-			if(NIGHTMARE)
-				window.location.hash = "Error";
 			if(!window.location.hash)
 				alert("Warning: No name set, you will be called " + NAME_PLAYER + ". To set a custom name add the # symbol followed by your desired name at the end of the URL, eg: #Bob");
-
 			document.removeEventListener("keydown", data.load_end_key, false);
 			data.element_title.remove();
 			data.element_title = undefined;
@@ -458,7 +455,7 @@ class game {
 		// Spawn target items across the bottom area, probability increases with lower positions
 		// Instantly clear any chains that form instead of waiting for the first game loop
 		// At least one target must be spawned otherwise the game is won from the start
-		while(this.items.length == 0) {
+		while(this.items.length == 0 && this.settings.target_chance > 0) {
 			for(let x = 0; x < this.settings.grid[0]; x++)
 				for(let y = this.settings.target_height; y < this.settings.grid[1]; y++) {
 					const probability = 1 - (this.settings.grid[1] - y) / (this.settings.grid[1] - this.settings.target_height);
@@ -483,6 +480,7 @@ class game {
 		this.timer = undefined;
 
 		if(success && this.level >= this.settings.levels) {
+			// The round was won and this was the final level
 			audio.sound = "game_won";
 			audio.play_sound();
 			audio.play_music(undefined, 1);
@@ -492,12 +490,18 @@ class game {
 				alert("Game over: You won! Thank you for playing, " + NAME_PLAYER + "... " + NAME_CHARACTER + " appreciates that you didn't misuse his name.");
 			location.reload();
 		} else if(success) {
+			// The round was won
 			audio.sound = "game_continue";
 			audio.play_sound();
 			this.level++;
 			this.element_label_level.innerHTML = Math.min(this.level, DISPLAY_LABEL_LIMIT);
 			this.game_start();
+		} else if(NIGHTMARE) {
+			// The game was lost in nightmare mode
+			window.close();
+			return;
 		} else {
+			// The game was lost
 			audio.sound = "game_lost";
 			audio.play_sound();
 			audio.play_music(undefined, 1);
@@ -648,7 +652,7 @@ class game {
 		const active_pos_x = Math.round(((active_pos[0] * 2) - this.settings.grid[0]) / this.settings.grid[0]) * this.settings.background_look;
 		const active_pos_y = Math.round(((active_pos[1] * 2) - this.settings.grid[1]) / this.settings.grid[1]) * this.settings.background_look;
 		this.background.set_foreground(targets[color] > 1 ? color : undefined);
-		this.background.set_eyes(color, [active_pos_x, active_pos_y]);
+		this.background.set_eyes(targets[color] > 0 ? color : undefined, [active_pos_x, active_pos_y]);
 
 		// Status 0 & 1: Preform an extra update or skip this tick
 		if(this.update_status(targets[0], 0))
@@ -701,7 +705,7 @@ class game {
 			if(this.items[i].target && this.items[i].active)
 				break;
 		}
-		if(!has_target)
+		if(!has_target && this.settings.target_chance > 0)
 			return this.game_end(true);
 
 		// If there's no active item, get the colors of the next item and spawn one
@@ -754,12 +758,9 @@ class game {
 				break;
 			}
 
-		// Cheat to jump to the next level, in nightmare mode this is disabled and will close the game instead
-		if(event.key == "Backspace")
-			if(NIGHTMARE)
-				window.close();
-			else
-				this.game_end(true);
+		// Cheat to jump to the next level, disabled in nightmare mode
+		if(event.key == "Backspace" && !NIGHTMARE)
+			this.game_end(true);
 
 		// Display gameplay instructions as well as status effects for active colors
 		if(event.key == "`") {
