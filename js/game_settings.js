@@ -1,18 +1,27 @@
+// This file contains only the settings objects and helper functions used to generate them, the engine is launched after this and reads the relevant variables
 // ITEM_COLOR must contain color names matching their respective image and sound file names, should be 8 in total to match statuses
 // ITEM_SPRITE_SEGMENT_* is based on item angle: 0 = up, 1 = right, 2 = down, 3 = left
-// BACKGROUNDS represents the background names based on difficulty, 4 in total
+// DATA_BACKGROUNDS represents the background names based on difficulty, 4 in total
+// DATA_DIALOGS is the list of dialog skins used by text messages
+// DATA_VOICES contains the name of each vocal pattern sound
 const DISPLAY_CANVAS_ZOOM = 3;
-const DISPLAY_CANVAS_BOX = [512, 0, 128 * DISPLAY_CANVAS_ZOOM, 256 * DISPLAY_CANVAS_ZOOM];
+const DISPLAY_CANVAS_BOX = [(window.innerWidth / 2) - (64 * DISPLAY_CANVAS_ZOOM), (window.innerHeight / 2) - (128 * DISPLAY_CANVAS_ZOOM), 128 * DISPLAY_CANVAS_ZOOM, 256 * DISPLAY_CANVAS_ZOOM];
 const DISPLAY_GAME_PADDING = 2;
+const DISPLAY_FONT_SIZE = 6 * DISPLAY_CANVAS_ZOOM;
+const DISPLAY_FONT_DURATION = 5;
+const DISPLAY_FONT_DURATION_CHARACTER = 0.05;
 const DISPLAY_LABEL_LIMIT = 9999;
+const DISPLAY_LABEL_SPEED = 0.05;
 const ITEM_COLOR = ["red", "yellow", "green", "cyan", "blue", "pink", "white", "black"];
 const ITEM_SPRITE_TARGET = "target";
 const ITEM_SPRITE_SINGLE = "center";
 const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
 const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
 const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
-const BACKGROUNDS = ["easy", "medium", "hard", "nightmare"];
-const MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "hail_the_arbiter_metal", "the_one_who_stands_distant"];
+const DATA_BACKGROUNDS = ["easy", "medium", "hard", "nightmare"];
+const DATA_DIALOGS = ["random", "interactive"];
+const DATA_VOICES = ["default_1", "default_2", "default_3", "default_4", "character_1", "character_2", "character_3", "character_4", "character_nightmare_1", "character_nightmare_2", "character_nightmare_3", "character_nightmare_4", "player_1", "player_2", "player_3", "player_4"];
+const DATA_MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "hail_the_arbiter_metal", "the_one_who_stands_distant"];
 
 // Character name is fixed, player name can be set via URL parameter
 // Nightmare mode is unlocked when the player uses the same name as the main character
@@ -24,7 +33,7 @@ const NIGHTMARE_AFTER = NAME_PLAYER.toLowerCase() == NAME_PLAYER_FALLBACK.toLowe
 if(NIGHTMARE)
 	window.location.hash = NAME_PLAYER_FALLBACK;
 
-// Helper function for setting item colors, when a color is undefined a random one used during normal stages is picked, one of the colors is replaced by the last color in nightmare mode
+// Function for setting item colors, when a color is undefined a random one used during normal stages is picked, one of the colors is replaced by the last color in nightmare mode
 function get_color() {
 	var colors = [];
 	for(let i = 0; i < arguments.length; i++)
@@ -38,13 +47,47 @@ function get_color() {
 	return colors;
 }
 
-// Helper function for getting item lengths, 1 is added in nightmare mode
+// Function for getting item lengths, 1 is added in nightmare mode
 function get_length() {
 	var lengths = [];
 	for(let i = 0; i < arguments.length; i++)
 		lengths.push(arguments[i] + (NIGHTMARE ? 1 : 0));
 	return lengths;
 }
+
+// Function for compiling dialog triggers
+function get_dialog_trigger(difficulty, level, color, random) {
+	return { "difficulty": difficulty, "level": level, "color": color, "random": random };
+}
+
+// Function for compiling dialog messages
+function get_dialog_message(color, sound, height, background, interactive, name, message) {
+	const text = name ? name + ": " + message : message;
+	return { "color": color, "sound": sound, "height": height, "background": background, "interactive": interactive, "text": text };
+}
+
+// This contains the chat messages used in between levels or shown idly during the game
+const voice_default = [DATA_VOICES[0], DATA_VOICES[1], DATA_VOICES[2], DATA_VOICES[3]];
+const voice_character = NIGHTMARE ? [DATA_VOICES[8], DATA_VOICES[9], DATA_VOICES[10], DATA_VOICES[11]] : [DATA_VOICES[4], DATA_VOICES[5], DATA_VOICES[6], DATA_VOICES[7]];
+const voice_player = [DATA_VOICES[12], DATA_VOICES[13], DATA_VOICES[14], DATA_VOICES[15]];
+const height_random = DISPLAY_FONT_SIZE * 5;
+const height_interactive = (DISPLAY_CANVAS_BOX[3] / 2) + (DISPLAY_FONT_SIZE * 4);
+var settings_dialog = [
+	{ "triggers": get_dialog_trigger(undefined, [0], undefined, false), "messages": [
+		get_dialog_message("#ffffff", voice_default, height_interactive, 1, true, undefined, "A fun new game has begun. Press Enter to continue.")
+	] },
+	{ "triggers": get_dialog_trigger(undefined, [5], undefined, false), "messages": [
+		get_dialog_message("#ffffff", voice_default, height_interactive, 1, true, undefined, "This concludes the trial for text. Aren't you excited for what will unfold here at some point? Come back next Git commit!")
+	] },
+	{ "triggers": get_dialog_trigger(undefined, [0, 1, 2, 3, 4, 5], undefined, true), "messages": [
+		get_dialog_message("#ffffff", voice_character, height_random, 0, false, NAME_CHARACTER, "Oh hey: We can chat here now! What do you think about that?"),
+		get_dialog_message("#000000", voice_player, height_random, 0, false, NAME_PLAYER, "Isn't that just great...")
+	] },
+	{ "triggers": get_dialog_trigger(undefined, [0, 1, 2, 3, 4, 5], undefined, true), "messages": [
+		get_dialog_message("#000000", voice_player, height_random, 0, false, NAME_PLAYER, "I want to have more interesting things to say."),
+		get_dialog_message("#ffffff", voice_character, height_random, 0, false, NAME_CHARACTER, "Tell the developer to stop sleeping 4 hours every night.")
+	] }
+];
 
 // Overrides can be used to change settings when reaching a particular level, only some settings are safe to override
 var settings_overrides = [
@@ -109,6 +152,7 @@ const SETTINGS = {
 	"position": [32 * DISPLAY_CANVAS_ZOOM, 64 * DISPLAY_CANVAS_ZOOM],
 	"grid": [8, 16],
 	"resolution": 8 * DISPLAY_CANVAS_ZOOM,
+	"chat": 0.025,
 	"levels": NIGHTMARE_AFTER ? 100 : 99,
 	"previews": 2,
 	"target_chance": 0.25,
@@ -121,5 +165,6 @@ const SETTINGS = {
 	"item_colors_nightmare": [7],
 	"statuses": [5, 5, 0.5, 0.5, 5, 2.5, 1, 0.25],
 	"music": undefined,
+	"dialog": settings_dialog,
 	"overrides": settings_overrides
 }
