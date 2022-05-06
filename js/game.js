@@ -89,9 +89,9 @@ class data {
 			data.load_audio("item_clear_" + ITEM_COLOR[c]);
 		}
 		for(let d in DATA_DIALOGS)
-			data.load_image("dialog_" + DATA_DIALOGS[d]);
+			data.load_image("dialog/" + DATA_DIALOGS[d]);
 		for(let v in DATA_VOICES)
-			data.load_audio("voice_" + DATA_VOICES[v]);
+			data.load_audio("voice/" + DATA_VOICES[v]);
 		for(let m in DATA_MUSIC)
 			data.load_audio("music/" + DATA_MUSIC[m]);
 	}
@@ -368,20 +368,19 @@ class item extends item_static {
 
 // Game dialog, handles showing chat messages
 class game_dialog {
-	constructor(parent, box, content) {
+	constructor(parent, box, messages) {
 		this.box = box;
-		this.content = content;
-		this.messages = [];
-		this.index = 0;
+		this.messages = messages;
+		this.index = undefined;
 		this.interactive = false;
 		this.ending = false;
 		this.timeout = undefined;
 		this.timer = undefined;
 
-		this.element_foreground = html_create(parent, "img", "foreground", this.box);
-		this.element_foreground.setAttribute("src", data.images["dialog_" + DATA_DIALOGS[0]].src);
+		this.element_foreground = html_create(parent, "img", "dialog", this.box);
+		this.element_foreground.setAttribute("src", data.images["dialog/" + DATA_DIALOGS[0]].src);
 		this.element_foreground.style["display"] = "none";
-		this.element_label = html_create(parent, "label", "label label_left", this.box);
+		this.element_label = html_create(parent, "label", "label label_dialog label_left", this.box);
 		this.element_label.style["font-size"] = DISPLAY_FONT_SIZE + "px";
 		this.element_label.innerHTML = "";
 	}
@@ -399,36 +398,33 @@ class game_dialog {
 	hide() {
 		clearInterval(this.timer);
 		clearTimeout(this.timeout);
-		this.timer = undefined;
-		this.timeout = undefined;
-		this.messages = [];
-		this.index = 0;
 		this.interactive = false;
 		this.ending = false;
+		this.timer = undefined;
+		this.timeout = undefined;
+		this.index = undefined;
 		this.element_foreground.style["display"] = "none";
 		this.element_label.innerHTML = "";
 	}
 
 	// Pick a random message based on game characteristics, undefined filters are ignored
-	// act: 0 = random, 1 = next level, 2 = game was lost, 3 = game was won
-	pick(difficulty, level, color, act) {
+	// trigger_at: 0 = no trigger, 1 = random, 2 = next level, 3 = game was lost, 4 = game was won
+	// trigger_difficulty: 0 = easy, 1 = medium, 2 = hard, 3 = nightmare
+	pick(at, difficulty, level, color) {
 		var indexes = [];
-		for(let i in this.content) {
-			if(this.content[i].triggers.act != act)
+		for(let i in this.messages) {
+			if(this.messages[i].trigger_at != at)
 				continue;
-			if(this.content[i].triggers.difficulty && !this.content[i].triggers.difficulty.includes(Math.floor(difficulty * 2) - 1))
+			if(this.messages[i].trigger_difficulty && !this.messages[i].trigger_difficulty.includes(Math.floor(difficulty * 2) - 1))
 				continue;
-			if(this.content[i].triggers.level && !this.content[i].triggers.level.includes(level))
+			if(this.messages[i].trigger_level && !this.messages[i].trigger_level.includes(level))
 				continue;
-			if(this.content[i].triggers.color && !this.content[i].triggers.color.includes(color))
+			if(this.messages[i].trigger_color && !this.messages[i].trigger_color.includes(color))
 				continue;
 			indexes.push(i);
 		}
 		if(indexes.length > 0) {
-			const index = indexes[Math.floor(Math.random() * indexes.length)];
-			this.ending = this.content[index].triggers.act == 2 || this.content[index].triggers.act == 3;
-			this.messages = this.content[index].messages;
-			this.index = 0;
+			this.index = +indexes[Math.floor(Math.random() * indexes.length)];
 			this.read();
 		}
 	}
@@ -436,16 +432,14 @@ class game_dialog {
 	// Advances to the next message or hides the dialog if this was the last entry, returns true if a valid message exists
 	// If this is an endgame dialog, refresh the window instead
 	advance() {
-		this.index++;
-		if(this.index >= this.messages.length) {
-			if(this.ending)
-				location.reload();
-			else
-				this.hide();
-			return false;
-		}
-		this.read();
-		return true;
+		if(this.messages[this.index].next && this.index + this.messages[this.index].next >= 0 && this.index + this.messages[this.index].next < this.messages.length) {
+			this.index += this.messages[this.index].next;
+			this.read();
+			return true;
+		} else if(this.ending)
+			location.reload();
+		this.hide();
+		return false;
 	}
 
 	// Add a new character to the string each tick until the full message is displayed
@@ -463,10 +457,11 @@ class game_dialog {
 		clearInterval(this.timer);
 		clearTimeout(this.timeout);
 		this.interactive = this.messages[this.index].interactive;
+		this.ending = this.ending ? true : this.messages[this.index].trigger_at == 3 || this.messages[this.index].trigger_at == 4;
 		this.timer = setInterval(this.print.bind(this), DISPLAY_LABEL_SPEED * 1000);
 		this.timeout = this.interactive ? undefined : setTimeout(this.advance.bind(this), (DISPLAY_FONT_DURATION + (DISPLAY_FONT_DURATION_CHARACTER * this.messages[this.index].text.length)) * 1000);
 
-		this.element_foreground.setAttribute("src", data.images["dialog_" + DATA_DIALOGS[this.messages[this.index].background]].src);
+		this.element_foreground.setAttribute("src", data.images["dialog/" + DATA_DIALOGS[this.messages[this.index].background]].src);
 		this.element_foreground.style["display"] = "block";
 		this.element_label.style["color"] = this.messages[this.index].color;
 		this.element_label.style["text-shadow"] = "none";
@@ -477,8 +472,8 @@ class game_dialog {
 			this.element_label.style["text-shadow"] = (+DISPLAY_FONT_SHADOW + "px 0px 0px " + DISPLAY_FONT_SHADOW_COLOR) + ", " + (-DISPLAY_FONT_SHADOW + "px 0px 0px " + DISPLAY_FONT_SHADOW_COLOR) + ", " + ("0px " + +DISPLAY_FONT_SHADOW + "px 0px " + DISPLAY_FONT_SHADOW_COLOR) + ", " + ("0px " + -DISPLAY_FONT_SHADOW + "px 0px " + DISPLAY_FONT_SHADOW_COLOR);
 		if(!isNaN(this.messages[this.index].music))
 			audio.play_music(this.messages[this.index].music);
-		if(this.messages[this.index].sound)
-			audio.sound = "voice_" + this.messages[this.index].sound[Math.floor(Math.random() * this.messages[this.index].sound.length)];
+		if(!isNaN(this.messages[this.index].sound))
+			audio.sound = "voice/" + DATA_VOICES[this.messages[this.index].sound];
 		audio.play_sound();
 	}
 }
@@ -538,10 +533,10 @@ class game {
 		this.dialog = new game_dialog(parent, box, this.settings.dialog);
 
 		this.element = html_create(parent, "div", "game", [this.settings.position[0], this.settings.position[1], this.settings.grid[0] * this.settings.resolution, (this.settings.grid[1] + this.settings.previews + DISPLAY_GAME_PADDING) * this.settings.resolution]);
-		this.element_label_score = html_create(parent, "label", "label label_left", [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
+		this.element_label_score = html_create(parent, "label", "label label_score", [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
 		this.element_label_score.style["font-size"] = DISPLAY_FONT_SIZE + "px";
 		this.element_label_score.innerHTML = 0;
-		this.element_label_level = html_create(parent, "label", "label label_right", [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
+		this.element_label_level = html_create(parent, "label", "label label_level", [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
 		this.element_label_level.style["font-size"] = DISPLAY_FONT_SIZE + "px";
 		this.element_label_level.innerHTML = 0;
 
@@ -598,7 +593,7 @@ class game {
 		this.timer_interval = Math.max(this.settings.time / this.difficulty * 1000, 1);
 		this.timer = setInterval(this.update.bind(this), this.timer_interval);
 		this.update();
-		this.dialog.pick(this.difficulty, this.level, this.targets(), 1);
+		this.dialog.pick(2, this.difficulty, this.level, this.targets());
 	}
 
 	// End the existing game
@@ -611,7 +606,7 @@ class game {
 			// The round was won and this was the final level
 			audio.sound = "game_won";
 			audio.play_sound();
-			this.dialog.pick(this.difficulty, this.level, this.targets(), 3);
+			this.dialog.pick(4, this.difficulty, this.level, this.targets());
 		} else if(success) {
 			// The round was won
 			audio.sound = "game_continue";
@@ -627,7 +622,7 @@ class game {
 			// The game was lost
 			audio.sound = "game_lost";
 			audio.play_sound();
-			this.dialog.pick(this.difficulty, this.level, this.targets(), 2);
+			this.dialog.pick(3, this.difficulty, this.level, this.targets());
 		}
 	}
 
@@ -856,8 +851,8 @@ class game {
 		}
 
 		// Pick a random dialog that matches the allowed filters, don't interrupt existing dialogue
-		if(this.dialog.messages.length == 0 && this.settings.chat * (this.timer_interval / 1000) > Math.random())
-			this.dialog.pick(this.difficulty, this.level, color, 0);
+		if(!this.dialog.index && this.settings.chat * (this.timer_interval / 1000) > Math.random())
+			this.dialog.pick(1, this.difficulty, this.level, color);
 		audio.play_sound();
 	}
 
@@ -866,10 +861,9 @@ class game {
 		// If an interactive dialog has focus, use Enter / Space to advance it then return
 		// Resume playing the normal level music if a song was previously set by the dialog
 		if(this.dialog.interactive) {
-			if(event.key == "Enter" || event.key == " ") {
+			if(event.key == "Enter" || event.key == " ")
 				if(!this.dialog.advance())
 					audio.play_music(this.settings.music);
-			}
 			return;
 		} else if(!this.timer || event.repeat)
 			return;

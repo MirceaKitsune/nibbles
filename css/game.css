@@ -3,20 +3,27 @@
   src: url(../ttf/public_pixel.ttf);
 }
 
-.label_left {
+.label_score {
 	text-align: left;
+	z-index: 3;
+	pointer-events: none;
 }
 
-.label_right {
+.label_level {
 	text-align: right;
+	z-index: 3;
+	pointer-events: none;
+}
+
+.label_dialog {
+	text-align: left;
+	z-index: 5;
+	pointer-events: none;
 }
 
 .label {
 	position: absolute;
 	overflow: hidden;
-
-	z-index: 5;
-	pointer-events: none;
 
 	font-family: PublicPixel;
 	font-weight: bold;
@@ -61,6 +68,17 @@
 }
 
 .foreground {
+	position: absolute;
+	overflow: hidden;
+
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+
+	z-index: 4;
+	pointer-events: none;
+}
+
+.dialog {
 	position: absolute;
 	overflow: hidden;
 

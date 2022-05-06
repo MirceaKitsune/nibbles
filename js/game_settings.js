@@ -8,10 +8,10 @@ const DISPLAY_CANVAS_ZOOM = 3;
 const DISPLAY_CANVAS_BOX = [(window.innerWidth / 2) - (64 * DISPLAY_CANVAS_ZOOM), (window.innerHeight / 2) - (128 * DISPLAY_CANVAS_ZOOM), 128 * DISPLAY_CANVAS_ZOOM, 256 * DISPLAY_CANVAS_ZOOM];
 const DISPLAY_GAME_PADDING = 2;
 const DISPLAY_FONT_SIZE = 6 * DISPLAY_CANVAS_ZOOM;
-const DISPLAY_FONT_DURATION = 5;
+const DISPLAY_FONT_DURATION = 4;
+const DISPLAY_FONT_DURATION_CHARACTER = 0.05;
 const DISPLAY_FONT_SHADOW = DISPLAY_CANVAS_ZOOM;
 const DISPLAY_FONT_SHADOW_COLOR = "#000000";
-const DISPLAY_FONT_DURATION_CHARACTER = 0.05;
 const DISPLAY_LABEL_LIMIT = 9999;
 const DISPLAY_LABEL_SPEED = 0.0125;
 const ITEM_COLOR = ["red", "yellow", "green", "cyan", "blue", "pink", "white", "black"];
@@ -21,8 +21,8 @@ const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
 const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
 const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
 const DATA_BACKGROUNDS = ["easy", "medium", "hard", "nightmare"];
-const DATA_DIALOGS = ["random", "interactive"];
-const DATA_VOICES = ["default_1", "default_2", "default_3", "default_4", "character_1", "character_2", "character_3", "character_4", "character_nightmare_1", "character_nightmare_2", "character_nightmare_3", "character_nightmare_4", "player_1", "player_2", "player_3", "player_4"];
+const DATA_DIALOGS = ["random_multi_start", "random_multi", "random_multi_end", "random_single", "level_multi_start", "level_multi", "level_multi_end", "level_single", "game_start", "game_start", "game_start", "game_start", "game_end", "game_end", "game_end", "game_end", "game_end", "game_end", "game_end", "game_end"];
+const DATA_VOICES = ["character_color_red", "character_color_yellow", "character_color_green", "character_color_cyan", "character_color_blue", "character_color_pink", "character_color_white", "character_color_black", "character_random_1", "character_random_2", "character_random_3", "character_random_4", "player_random_1", "player_random_2", "player_random_3", "player_random_4", "default_random_1", "default_random_2"];
 const DATA_MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "hail_the_arbiter_metal", "the_one_who_stands_distant"];
 
 // Character name is fixed, player name can be set via URL parameter
@@ -59,44 +59,81 @@ function get_length() {
 	return lengths;
 }
 
-// Function for compiling dialog triggers
-function get_dialog_trigger(difficulty, level, color, act) {
-	return { "difficulty": difficulty, "level": level, "color": color, "act": act };
+// Function and objects for compiling dialog messages, minimizes the number of settings necessary by guessing the purpose of each message based on its background and sound
+// While the engine itself allows more features and message combinations, this helps simplify the definitions as the default game configuration follows simple patterns
+// Dialog background indexes are categorized based on their trigger: 0 = First message in a chain, 1 to * = Continuation in a chain, 2 = Last message in a chain, 3 = Singular message
+// Dialog sound indexes are sorted by character and circumstance: Only character messages can be color specific, generic character messages are white and player messages are black
+// The variables below must be carefully kept in sync with DATA_DIALOGS and DATA_VOICES, see the comments on how each setting is interpreted for more information
+const dialog_background = { "random": [0, 1, 2, 3], "level": [4, 5, 6, 7], "game_start": [8, 9, 10, 11], "game_end_lose": [12, 13, 14, 15], "game_end_win": [16, 17, 18, 19] };
+const dialog_sound = { "character_color": [0, 1, 2, 3, 4, 5, 6, 7], "character": [8, 9, 10, 11], "player": [12, 13, 14, 15], "default": [16, 17] };
+function get_dialog_message(trigger_difficulty, trigger_level, background, sound, music, message) {
+	// The sound used by the message tells us the character and target color it refers to
+	// Sounds 0 to 7 match item colors, 8 to 11 are random character messages, 12 to 15 are random player messages, 16 to 17 are system messages
+	const colors = ["#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff", "#ff00ff", "#ffffff", "#000000", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#000000", "#000000", "#000000", "#000000", "#ffffff", "#ffffff"];
+	const color = colors[sound];
+	const trigger_color = sound < 8 ? [sound] : undefined;
+
+	// The trigger of the message is determined based on which category its background is defined in
+	// The message is only triggered if its background is either the start of a chain or a singular message, meaning the first or last entry of its category
+	// Trigger at: 0 = No trigger, 1 = Random, 2 = Next level, 3 = Game was lost, 4 = Game was won
+	var trigger_at = 0;
+	if(background == dialog_background.random[0] || background == dialog_background.random[dialog_background.random.length - 1])
+		trigger_at = 1;
+	if(background == dialog_background.level[0] || background == dialog_background.level[dialog_background.level.length - 1])
+		trigger_at = 2;
+	if(background == dialog_background.game_start[0] || background == dialog_background.game_start[dialog_background.game_start.length - 1])
+		trigger_at = 2;
+	if(background == dialog_background.game_end_lose[0] || background == dialog_background.game_end_lose[dialog_background.game_end_lose.length - 1])
+		trigger_at = 3;
+	if(background == dialog_background.game_end_win[0] || background == dialog_background.game_end_win[dialog_background.game_end_win.length - 1])
+		trigger_at = 4;
+
+	// If the chosen background is the start or middle segment of a dialog chain, we know the message after it is meant to be shown next
+	var next = 0;
+	for(let i in dialog_background)
+		if(dialog_background[i].slice(0, dialog_background[i].length - 2).includes(background))
+			next = 1;
+
+	// Prefix the name if there's an actor speaking
+	var text = message;
+	if(sound >= 0 && sound <= 11)
+		text = NAME_CHARACTER + ": " + message;
+	else if(sound >= 12 && sound <= 15)
+		text = NAME_PLAYER + ": " + message;
+
+	// We know this is an interactive message if the background isn't that of the random message
+	// Random messages are shown at the bottom (4 lines max) whereas interactive ones appear at the center (8 lines max)
+	const interactive = background >= 4;
+	const height = interactive ? (DISPLAY_CANVAS_BOX[3] / 2) + (DISPLAY_FONT_SIZE * 4) : DISPLAY_FONT_SIZE * 5;
+	return { "trigger_at": trigger_at, "trigger_difficulty": trigger_difficulty, "trigger_level": trigger_level, "trigger_color": trigger_color, "next": next, "height": height, "color": color, "background": background, "sound": sound, "music": music, "interactive": interactive, "text": text };
 }
 
-// Function for compiling dialog messages
-function get_dialog_message(color, height, background, sound, music, interactive, name, message) {
-	const text = name ? name + ": " + message : message;
-	return { "color": color, "height": height, "background": background, "sound": sound, "music": music, "interactive": interactive, "text": text };
-}
-
-// This contains the chat messages used in between levels or shown idly during the game
-const voice_default = [DATA_VOICES[0], DATA_VOICES[1], DATA_VOICES[2], DATA_VOICES[3]];
-const voice_character = NIGHTMARE ? [DATA_VOICES[8], DATA_VOICES[9], DATA_VOICES[10], DATA_VOICES[11]] : [DATA_VOICES[4], DATA_VOICES[5], DATA_VOICES[6], DATA_VOICES[7]];
-const voice_player = [DATA_VOICES[12], DATA_VOICES[13], DATA_VOICES[14], DATA_VOICES[15]];
-const height_random = DISPLAY_FONT_SIZE * 5;
-const height_interactive = (DISPLAY_CANVAS_BOX[3] / 2) + (DISPLAY_FONT_SIZE * 4);
+// This contains the chat messages shown when winning / losing or in between levels or idly during the game
 var settings_dialog = [
-	{ "triggers": get_dialog_trigger(undefined, undefined, undefined, 2), "messages": [
-		get_dialog_message("#ffffff", height_interactive, 1, undefined, undefined, true, undefined, "The game was lost.")
-	] },
-	{ "triggers": get_dialog_trigger(undefined, undefined, undefined, 3), "messages": [
-		get_dialog_message("#ffffff", height_interactive, 1, undefined, undefined, true, undefined, "The game was won.")
-	] },
-	{ "triggers": get_dialog_trigger(undefined, [0], undefined, 1), "messages": [
-		get_dialog_message("#ffffff", height_interactive, 1, voice_default, undefined, true, undefined, "A fun new game has begun. Press Enter to continue.")
-	] },
-	{ "triggers": get_dialog_trigger(undefined, [5], undefined, 1), "messages": [
-		get_dialog_message("#ffffff", height_interactive, 1, voice_default, undefined, true, undefined, "This concludes the trial for text. Aren't you excited for what will unfold here at some point? Come back next Git commit!")
-	] },
-	{ "triggers": get_dialog_trigger(undefined, [0, 1, 2, 3, 4, 5], undefined, 0), "messages": [
-		get_dialog_message("#ffffff", height_random, 0, voice_character, undefined, false, NAME_CHARACTER, "Oh hey: We can chat here now! What do you think about that?"),
-		get_dialog_message("#000000", height_random, 0, voice_player, undefined, false, NAME_PLAYER, "Isn't that just great...")
-	] },
-	{ "triggers": get_dialog_trigger(undefined, [0, 1, 2, 3, 4, 5], undefined, 0), "messages": [
-		get_dialog_message("#000000", height_random, 0, voice_player, undefined, false, NAME_PLAYER, "I want to have more interesting things to say."),
-		get_dialog_message("#ffffff", height_random, 0, voice_character, undefined, false, NAME_CHARACTER, "Tell the developer to stop sleeping 4 hours every night.")
-	] }
+	// Game start
+	get_dialog_message(undefined, [0], dialog_background.game_start[3], dialog_sound.default[0], undefined, "A fun new game has begun. Press Enter to continue."),
+	// Game lost, 8 different endings based on the predominant target color at the moment of losing
+	get_dialog_message(undefined, undefined, dialog_background.game_end_lose[3], dialog_sound.default[1], undefined, "The game was lost."),
+	// Game won, 4 different endings based on the difficulty
+	get_dialog_message(undefined, undefined, dialog_background.game_end_win[3], dialog_sound.default[2], undefined, "The game was won."),
+	// Level milestones, a conversation takes place every 5 levels
+	get_dialog_message(undefined, [5], dialog_background.level[3], dialog_sound.default[0], undefined, "You've reached the first level milestone."),
+	// Random messages test, will be removed later as all randoms are color related
+	get_dialog_message(undefined, undefined, dialog_background.random[0], dialog_sound.character[0], undefined, "Oh hey: We can chat here now! What do you think about that?"),
+	get_dialog_message(undefined, undefined, dialog_background.random[1], dialog_sound.player[0], undefined, "Isn't that just great..."),
+	get_dialog_message(undefined, undefined, dialog_background.random[1], dialog_sound.character[1], undefined, "Come on now: It's not THAT weird!"),
+	get_dialog_message(undefined, undefined, dialog_background.random[2], dialog_sound.player[1], undefined, "You're going to make it that way."),
+	get_dialog_message(undefined, undefined, dialog_background.random[0], dialog_sound.player[2], undefined, "I want to have more interesting things to say."),
+	get_dialog_message(undefined, undefined, dialog_background.random[2], dialog_sound.character[2], undefined, "Tell the developer to stop sleeping 4 hours every night."),
+	// Random messages based on the top active color, a different set is registered for every 25 levels
+	get_dialog_message(undefined, undefined, dialog_background.random[3], dialog_sound.character_color[0], undefined, "The highest target is red!"),
+	get_dialog_message(undefined, undefined, dialog_background.random[3], dialog_sound.character_color[1], undefined, "The highest target is yellow!"),
+	get_dialog_message(undefined, undefined, dialog_background.random[3], dialog_sound.character_color[2], undefined, "The highest target is green!"),
+	get_dialog_message(undefined, undefined, dialog_background.random[3], dialog_sound.character_color[3], undefined, "The highest target is cyan!"),
+	get_dialog_message(undefined, undefined, dialog_background.random[3], dialog_sound.character_color[4], undefined, "The highest target is blue!"),
+	get_dialog_message(undefined, undefined, dialog_background.random[3], dialog_sound.character_color[5], undefined, "The highest target is pink!"),
+	get_dialog_message(undefined, undefined, dialog_background.random[3], dialog_sound.character_color[6], undefined, "The highest target is white!"),
+	get_dialog_message(undefined, undefined, dialog_background.random[3], dialog_sound.character_color[7], undefined, "The highest target is black!"),
 ];
 
 // Overrides can be used to change settings when reaching a particular level, only some settings are safe to override
