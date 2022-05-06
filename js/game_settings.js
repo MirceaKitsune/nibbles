@@ -9,9 +9,11 @@ const DISPLAY_CANVAS_BOX = [(window.innerWidth / 2) - (64 * DISPLAY_CANVAS_ZOOM)
 const DISPLAY_GAME_PADDING = 2;
 const DISPLAY_FONT_SIZE = 6 * DISPLAY_CANVAS_ZOOM;
 const DISPLAY_FONT_DURATION = 5;
+const DISPLAY_FONT_SHADOW = DISPLAY_CANVAS_ZOOM;
+const DISPLAY_FONT_SHADOW_COLOR = "#000000";
 const DISPLAY_FONT_DURATION_CHARACTER = 0.05;
 const DISPLAY_LABEL_LIMIT = 9999;
-const DISPLAY_LABEL_SPEED = 0.05;
+const DISPLAY_LABEL_SPEED = 0.0125;
 const ITEM_COLOR = ["red", "yellow", "green", "cyan", "blue", "pink", "white", "black"];
 const ITEM_SPRITE_TARGET = "target";
 const ITEM_SPRITE_SINGLE = "center";
@@ -27,11 +29,13 @@ const DATA_MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_sta
 // Nightmare mode is unlocked when the player uses the same name as the main character
 const NAME_CHARACTER = "Nibbles";
 const NAME_PLAYER_FALLBACK = "Selbbin";
-const NAME_PLAYER = window.location.hash.substring(1) || "Player";
+const NAME_PLAYER = window.location.hash.substring(1).slice(0, 8) || "Player";
 const NIGHTMARE = NAME_PLAYER.toLowerCase() == NAME_CHARACTER.toLowerCase();
 const NIGHTMARE_AFTER = NAME_PLAYER.toLowerCase() == NAME_PLAYER_FALLBACK.toLowerCase();
 if(NIGHTMARE)
 	window.location.hash = NAME_PLAYER_FALLBACK;
+else if(!window.location.hash)
+	window.location.hash = NAME_PLAYER;
 
 // Function for setting item colors, when a color is undefined a random one used during normal stages is picked, one of the colors is replaced by the last color in nightmare mode
 function get_color() {
@@ -56,14 +60,14 @@ function get_length() {
 }
 
 // Function for compiling dialog triggers
-function get_dialog_trigger(difficulty, level, color, random) {
-	return { "difficulty": difficulty, "level": level, "color": color, "random": random };
+function get_dialog_trigger(difficulty, level, color, act) {
+	return { "difficulty": difficulty, "level": level, "color": color, "act": act };
 }
 
 // Function for compiling dialog messages
-function get_dialog_message(color, sound, height, background, interactive, name, message) {
+function get_dialog_message(color, height, background, sound, music, interactive, name, message) {
 	const text = name ? name + ": " + message : message;
-	return { "color": color, "sound": sound, "height": height, "background": background, "interactive": interactive, "text": text };
+	return { "color": color, "height": height, "background": background, "sound": sound, "music": music, "interactive": interactive, "text": text };
 }
 
 // This contains the chat messages used in between levels or shown idly during the game
@@ -73,19 +77,25 @@ const voice_player = [DATA_VOICES[12], DATA_VOICES[13], DATA_VOICES[14], DATA_VO
 const height_random = DISPLAY_FONT_SIZE * 5;
 const height_interactive = (DISPLAY_CANVAS_BOX[3] / 2) + (DISPLAY_FONT_SIZE * 4);
 var settings_dialog = [
-	{ "triggers": get_dialog_trigger(undefined, [0], undefined, false), "messages": [
-		get_dialog_message("#ffffff", voice_default, height_interactive, 1, true, undefined, "A fun new game has begun. Press Enter to continue.")
+	{ "triggers": get_dialog_trigger(undefined, undefined, undefined, 2), "messages": [
+		get_dialog_message("#ffffff", height_interactive, 1, undefined, undefined, true, undefined, "The game was lost.")
 	] },
-	{ "triggers": get_dialog_trigger(undefined, [5], undefined, false), "messages": [
-		get_dialog_message("#ffffff", voice_default, height_interactive, 1, true, undefined, "This concludes the trial for text. Aren't you excited for what will unfold here at some point? Come back next Git commit!")
+	{ "triggers": get_dialog_trigger(undefined, undefined, undefined, 3), "messages": [
+		get_dialog_message("#ffffff", height_interactive, 1, undefined, undefined, true, undefined, "The game was won.")
 	] },
-	{ "triggers": get_dialog_trigger(undefined, [0, 1, 2, 3, 4, 5], undefined, true), "messages": [
-		get_dialog_message("#ffffff", voice_character, height_random, 0, false, NAME_CHARACTER, "Oh hey: We can chat here now! What do you think about that?"),
-		get_dialog_message("#000000", voice_player, height_random, 0, false, NAME_PLAYER, "Isn't that just great...")
+	{ "triggers": get_dialog_trigger(undefined, [0], undefined, 1), "messages": [
+		get_dialog_message("#ffffff", height_interactive, 1, voice_default, undefined, true, undefined, "A fun new game has begun. Press Enter to continue.")
 	] },
-	{ "triggers": get_dialog_trigger(undefined, [0, 1, 2, 3, 4, 5], undefined, true), "messages": [
-		get_dialog_message("#000000", voice_player, height_random, 0, false, NAME_PLAYER, "I want to have more interesting things to say."),
-		get_dialog_message("#ffffff", voice_character, height_random, 0, false, NAME_CHARACTER, "Tell the developer to stop sleeping 4 hours every night.")
+	{ "triggers": get_dialog_trigger(undefined, [5], undefined, 1), "messages": [
+		get_dialog_message("#ffffff", height_interactive, 1, voice_default, undefined, true, undefined, "This concludes the trial for text. Aren't you excited for what will unfold here at some point? Come back next Git commit!")
+	] },
+	{ "triggers": get_dialog_trigger(undefined, [0, 1, 2, 3, 4, 5], undefined, 0), "messages": [
+		get_dialog_message("#ffffff", height_random, 0, voice_character, undefined, false, NAME_CHARACTER, "Oh hey: We can chat here now! What do you think about that?"),
+		get_dialog_message("#000000", height_random, 0, voice_player, undefined, false, NAME_PLAYER, "Isn't that just great...")
+	] },
+	{ "triggers": get_dialog_trigger(undefined, [0, 1, 2, 3, 4, 5], undefined, 0), "messages": [
+		get_dialog_message("#000000", height_random, 0, voice_player, undefined, false, NAME_PLAYER, "I want to have more interesting things to say."),
+		get_dialog_message("#ffffff", height_random, 0, voice_character, undefined, false, NAME_CHARACTER, "Tell the developer to stop sleeping 4 hours every night.")
 	] }
 ];
 
