@@ -444,8 +444,9 @@ class game_dialog {
 
 	// Add a new character to the string each tick until the full message is displayed
 	print() {
-		if(this.element_label.innerHTML.length < this.messages[this.index].text.length)
-			this.element_label.innerHTML += this.messages[this.index].text.charAt(this.element_label.innerHTML.length);
+		const text = this.messages[this.index].name ? this.messages[this.index].name + ": " + this.messages[this.index].text : this.messages[this.index].text;
+		if(this.element_label.innerHTML.length < text.length)
+			this.element_label.innerHTML += text.charAt(this.element_label.innerHTML.length);
 		else {
 			clearInterval(this.timer);
 			this.timer = undefined;
@@ -459,7 +460,7 @@ class game_dialog {
 		this.interactive = this.messages[this.index].interactive;
 		this.ending = this.ending ? true : this.messages[this.index].trigger_at == 3 || this.messages[this.index].trigger_at == 4;
 		this.timer = setInterval(this.print.bind(this), DISPLAY_LABEL_SPEED * 1000);
-		this.timeout = this.interactive ? undefined : setTimeout(this.advance.bind(this), (DISPLAY_FONT_DURATION + (DISPLAY_FONT_DURATION_CHARACTER * this.messages[this.index].text.length)) * 1000);
+		this.timeout = this.interactive ? undefined : setTimeout(this.advance.bind(this), DISPLAY_FONT_DURATION * 1000);
 
 		this.element_foreground.setAttribute("src", data.images["dialog/" + DATA_DIALOGS[this.messages[this.index].background]].src);
 		this.element_foreground.style["display"] = "block";
