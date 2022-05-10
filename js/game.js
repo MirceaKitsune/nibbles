@@ -545,7 +545,7 @@ class game {
 		document.addEventListener("keydown", this.key.bind(this), false);
 		this.game_start();
 	}
-	
+
 	remove() {
 		clearInterval(this.timer);
 		this.timer = undefined;
@@ -574,20 +574,39 @@ class game {
 		for(let i = 0; i < this.settings.previews; i++)
 			this.next();
 
-		// Spawn target items across the bottom area, probability increases with lower positions
-		// Instantly clear any chains that form instead of waiting for the first game loop
-		// At least one target must be spawned otherwise the game is won from the start
-		while(this.items.length == 0 && this.settings.target_chance > 0) {
+		// Spawn target items across the bottom area, at least one target must be spawned otherwise the game is won from the start
+		if(this.settings.target_count_max > 0) {
+			const count = this.settings.target_count_min + Math.floor(Math.random() * (this.settings.target_count_max - this.settings.target_count_min + 1));
+
+			// X: Valid positions are more probable the closer they are to either edge
+			// Y: Valid positions are more probable the closer they get to the bottom
+			var positions_x = [];
+			var positions_y = [];
 			for(let x = 0; x < this.settings.grid[0]; x++)
-				for(let y = this.settings.target_height; y < this.settings.grid[1]; y++) {
-					const probability = 1 - (this.settings.grid[1] - y) / (this.settings.grid[1] - this.settings.target_height);
-					if(probability * this.settings.target_chance > Math.random()) {
-						const it = new item(this.element, this.items, this.settings_item, [random_array(this.settings.item_colors)]);
-						it.set_pos([x, y], 0);
-						it.set_target(true);
-					}
-				}
-			this.chain(false);
+				for(let i = 0; i <= Math.abs(x - Math.floor(this.settings.grid[0] / 2)); i++)
+					positions_x.push(x);
+			for(let y = this.settings.target_height; y < this.settings.grid[1]; y++)
+				for(let i = 0; i <= y - this.settings.target_height; i++)
+					positions_y.push(y);
+
+			// Keep trying to spawn targets at random positions until the chosen count has been achieved
+			spawn:
+			while(this.items.length < count) {
+				// We can never spawn two items in the same location, retry if the same spot was picked twice
+				const pos = [random_array(positions_x), random_array(positions_y)];
+				for(let i in this.items)
+					if(this.items[i].position[0] == pos[0] && this.items[i].position[1] == pos[1])
+						continue spawn;
+
+				// Spawn a new target
+				const it = new item(this.element, this.items, this.settings_item, [random_array(this.settings.item_colors)]);
+				it.set_pos(pos, 0);
+				it.set_target(true);
+
+				// Instantly clear any chains that may form or this would happen during the first game loop
+				if(this.items.length >= this.settings.chain)
+					this.chain(false);
+			}
 		}
 
 		audio.play_music(this.settings.music);
@@ -830,7 +849,7 @@ class game {
 			if(this.items[i].target && this.items[i].active)
 				break;
 		}
-		if(!has_target && this.settings.target_chance > 0)
+		if(!has_target && this.settings.target_count_max > 0)
 			return this.game_end(true);
 
 		// If there's no active item, get the colors of the next item and spawn one

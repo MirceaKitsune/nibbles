@@ -157,6 +157,10 @@ const random_levels_2 = [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
 const random_levels_3 = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89];
 const random_levels_4 = [90, 91, 92, 93, 94, 95, 96, 97, 98, 99];
 const settings_dialog = [
+	// Game lost: 8 different endings based on the predominant target color at the moment of losing
+	get_dialog_message("game_end_lose_0", undefined, "The game was lost."),
+	// Game won: 4 different endings based on the difficulty
+	get_dialog_message("game_end_win_0", undefined, "The game was won."),
 	// Game start: One message for nightmare mode, the full chain for normal difficulties
 	get_dialog_message("game_start_0", { "trigger_difficulty": [3] }, "You already know all this by now, so let's skip to the painful part you're here for."),
 	get_dialog_message("game_start_1", { "trigger_difficulty": [0, 1, 2] }, "Once upon a time there lived a kid called " + NAME_PLAYER + ". One night " + NAME_PLAYER + " went outside for a walk alone around the lake."),
@@ -172,18 +176,27 @@ const settings_dialog = [
 	get_dialog_message("level_character_2", undefined, "Weeeel it's a little complicated. It's easy for us to eat things but harder to get them out... safely. Maybe some laxatives..."),
 	get_dialog_message("level_player_2", undefined, "Not that way, my people have standards! You have to cough me up. Can't you just teleport me out or something?"),
 	get_dialog_message("level_character_2", undefined, "I can try. You might be gibbed to pieces if the battery is low, but I think I charged it last time so..."),
-	get_dialog_message("level_player_2", undefined, "No! There's some medicine in one of the closets, try taking a few pills and see if that works."),
-	get_dialog_message("level_character_2", undefined, "Okie, but my belly might be sensitive to certain chemicals! I should pull up my X-ray machine just in case."),
-	get_dialog_message("level_player_2", undefined, "Well my body might be sensitive to your stomach juices! I'll sort them carefully, you can guide me I guess."),
-	get_dialog_message("level_character_2", undefined, "Just don't be surprised if I act weird: Chemicals tend to affect our mood and I already ate some weird stuff before landing."),
-	get_dialog_message("level_player_3", undefined, "With you I can imagine. This is going to be a long night."),
-	// Game lost: 8 different endings based on the predominant target color at the moment of losing
-	get_dialog_message("game_end_lose_0", undefined, "The game was lost."),
-	// Game won: 4 different endings based on the difficulty
-	get_dialog_message("game_end_win_0", undefined, "The game was won."),
-	// Level milestones: a conversation takes place every 5 levels
-	get_dialog_message("level_character_0", { "trigger_level": [5] }, "You've reached the first level milestone."),
-	// Random messages based on active color: levels 0 to 30, set 1 (4 message dialogue)
+	get_dialog_message("level_player_2", undefined, "No! There's some medicine in one of the closets, maybe take some of the large pills and see if that works."),
+	get_dialog_message("level_character_2", undefined, "Good idea, I could use the treatment to adjust. I should pull up my X-ray machine just in case."),
+	get_dialog_message("level_player_3", undefined, "At least I get to kill my boredom by sorting pills. You can guide me if you think it helps I guess."),
+	// Level milestones, warmup stage:
+	get_dialog_message("level_player_1", { "trigger_level": [1] }, "What was that thing?! I threw a bunch of pills at it and it went away."),
+	get_dialog_message("level_character_2", undefined, "Ugh. The tiny blobs? They form as coping machanism, each type transfers different errors out of the system."),
+	get_dialog_message("level_player_2", undefined, "That's a lesson in alien anatomy I didn't need. Everything okay? There seems to be more of them popping up."),
+	get_dialog_message("level_character_3", undefined, "They're making me feel... errored out. Your pills seem to help though, just make sure to connect them properly."),
+	get_dialog_message("level_character_1", { "trigger_level": [2] }, "I feel trippy. I've been to many planets but this one's really taking its toll on me."),
+	get_dialog_message("level_player_2", undefined, "It must be the pills, this all started when you took them. Maybe we should stop the treatment..."),
+	get_dialog_message("level_character_2", undefined, "It's not that: Your plane's low frequency is messing with my systems. The pills seem to help my regulators."),
+	get_dialog_message("level_player_3", undefined, "Frequency... systems... regulators? This is going to be another long night of playing doctor."),
+	get_dialog_message("level_player_1", { "trigger_level": [3] }, "Can't you just spit those blobs out? Earth cats cough up hairballs all the time."),
+	get_dialog_message("level_character_2", undefined, "They're appearing faster than usual. Our stomachs also tighten shut when there's prey inside... no offense."),
+	get_dialog_message("level_player_2", undefined, "Wonderful, so I'm completely fucked unless we find a solution fast. Wonder if I'll melt or get vaporized."),
+	get_dialog_message("level_character_3", undefined, "Relax: At worst you'll get assimilated. I think... not sure what happens to double helix critters."),
+	get_dialog_message("level_player_1", { "trigger_level": [4] }, "Okay... I don't think you randomly chugging pills is getting me out of here any sooner."),
+	get_dialog_message("level_character_2", undefined, "Yeaaaah we should probably take this more methodically tomorrow. See which substance affects my system in what way."),
+	get_dialog_message("level_player_2", undefined, "Well, since I'll be stuck here for a while, may as well ask what your name is. I'm " + NAME_PLAYER + "."),
+	get_dialog_message("level_character_3", undefined, "You couldn't pronounce mine with your vocal cords. Given the circumstances, I guess you can call me... " + NAME_CHARACTER + "!"),
+	// Random messages: Stage 1 (levels 0 to 30) set 1 (4 message dialogue)
 	get_dialog_message("random_character_color_red_1", { "trigger_level": random_levels_1 }, "The highest target is red!"),
 	get_dialog_message("random_player_3", { "trigger_level": random_levels_1 }, "Yes, it is."),
 	get_dialog_message("random_character_color_yellow_1", { "trigger_level": random_levels_1 }, "The highest target is yellow!"),
@@ -204,16 +217,30 @@ const settings_dialog = [
 
 // Overrides can be used to change settings when reaching a particular level, only some settings are safe to override
 var settings_overrides = [
-	// Warmup stage: 2x pills, 2 colors
+	// Warmup stage: 2x pills, 2 colors, 1 - 5 targets
+	{ "level": 0, "setting": "target_count_min", "value": 1 },
+	{ "level": 0, "setting": "target_count_max", "value": 1 },
+	{ "level": 1, "setting": "target_count_min", "value": 2 },
+	{ "level": 1, "setting": "target_count_max", "value": 2 },
+	{ "level": 2, "setting": "target_count_min", "value": 3 },
+	{ "level": 2, "setting": "target_count_max", "value": 3 },
+	{ "level": 3, "setting": "target_count_min", "value": 4 },
+	{ "level": 3, "setting": "target_count_max", "value": 4 },
+	{ "level": 4, "setting": "target_count_min", "value": 5 },
+	{ "level": 4, "setting": "target_count_max", "value": 5 },
 	{ "level": 0, "setting": "item_length", "value": get_length(2) },
 	{ "level": 0, "setting": "item_colors", "value": get_color(undefined, undefined) },
-	// 1st stage: 2x pills, 3 colors
+	// 1st stage: 2x pills, 3 colors, 5 - 10 targets
+	{ "level": 5, "setting": "target_count_min", "value": 4 },
+	{ "level": 5, "setting": "target_count_max", "value": 8 },
 	{ "level": 5, "setting": "item_length", "value": get_length(2) },
 	{ "level": 5, "setting": "item_colors", "value": get_color(0, 0, 0, 1, 1, 2) },
 	{ "level": 10, "setting": "item_colors", "value": get_color(1, 1, 1, 2, 2, 3) },
 	{ "level": 15, "setting": "item_colors", "value": get_color(2, 2, 2, 3, 3, 4) },
 	{ "level": 20, "setting": "item_colors", "value": get_color(3, 3, 3, 4, 4, 5) },
-	// 2nd stage: 1x - 2x pills, 4 colors
+	// 2nd stage: 1x - 2x pills, 4 colors, 10 - 15 targets
+	{ "level": 25, "setting": "target_count_min", "value": 4 },
+	{ "level": 25, "setting": "target_count_max", "value": 12 },
 	{ "level": 25, "setting": "item_length", "value": get_length(1, 2, 2) },
 	{ "level": 25, "setting": "item_colors", "value": get_color(3, 4, 4, 5, 5, 5, 0, 0, 0, 0) },
 	{ "level": 30, "setting": "item_colors", "value": get_color(4, 5, 5, 0, 0, 0, 1, 1, 1, 1) },
@@ -221,7 +248,9 @@ var settings_overrides = [
 	{ "level": 40, "setting": "item_colors", "value": get_color(0, 1, 1, 2, 2, 2, 3, 3, 3, 3) },
 	{ "level": 45, "setting": "item_colors", "value": get_color(1, 2, 2, 3, 3, 3, 4, 4, 4, 4) },
 	{ "level": 50, "setting": "item_colors", "value": get_color(2, 3, 3, 4, 4, 4, 5, 5, 5, 5) },
-	// 3rd stage: 1x - 3x pills, 3 colors
+	// 3rd stage: 1x - 3x pills, 3 colors, 15 - 20 targets
+	{ "level": 55, "setting": "target_count_min", "value": 8 },
+	{ "level": 55, "setting": "target_count_max", "value": 12 },
 	{ "level": 55, "setting": "item_length", "value": get_length(1, 2, 2, 3) },
 	{ "level": 55, "setting": "item_colors", "value": get_color(undefined, undefined, undefined) },
 	{ "level": 60, "setting": "item_colors", "value": get_color(0, 0, 0, 2, 2, 4) },
@@ -230,7 +259,9 @@ var settings_overrides = [
 	{ "level": 75, "setting": "item_colors", "value": get_color(3, 3, 3, 5, 5, 1) },
 	{ "level": 80, "setting": "item_colors", "value": get_color(4, 4, 4, 0, 0, 2) },
 	{ "level": 85, "setting": "item_colors", "value": get_color(5, 5, 5, 1, 1, 3) },
-	// Final stage: 2x - 3x pills, 2 - 3 colors
+	// Final stage: 2x - 3x pills, 2 - 3 colors, 20 - 25 targets
+	{ "level": 90, "setting": "target_count_min", "value": 8 },
+	{ "level": 90, "setting": "target_count_max", "value": 16 },
 	{ "level": 90, "setting": "item_length", "value": get_length(1, 2) },
 	{ "level": 95, "setting": "item_length", "value": get_length(2, 3) },
 	{ "level": 90, "setting": "item_colors", "value": get_color(undefined, undefined, 6, 6) },
@@ -243,18 +274,17 @@ var settings_overrides = [
 	{ "level": 97, "setting": "item_colors", "value": get_color(undefined, 6, 6) },
 	{ "level": 98, "setting": "item_colors", "value": get_color(undefined, 6, 6) },
 	{ "level": 99, "setting": "item_colors", "value": get_color(undefined, 6, 6) },
-	// Secret stage: 1x pills, 8 colors
+	// Secret stage: 1x pills, 8 colors, 0 targets
+	{ "level": 100, "setting": "target_count_min", "value": 0 },
+	{ "level": 100, "setting": "target_count_max", "value": 0 },
 	{ "level": 100, "setting": "item_length", "value": get_length(1) },
 	{ "level": 100, "setting": "item_colors", "value": get_color(0, 1, 2, 3, 4, 5, 6, 7) }
 ];
-for(let i = 0; i <= 100; i++) {
-	// Tick rate ranges from 1.0 to 0.2 for 100 levels
-	// Target chance ranges from 0.5 to 0.25: For the best difficulty curve it peaks at level 50 then decreases again
+// Tick rate ranges from 1.0 to 0.2
+for(let i = 0; i <= 100; i++)
 	settings_overrides.push({ "level": i, "setting": "time", "value": i >= 100 ? 1 : 1 - i / 125 });
-	settings_overrides.push({ "level": i, "setting": "target_chance", "value": i >= 100 ? 0 : 0.25 + (Math.abs(50 - i) / 50) * 0.25 });
-}
+// One new song every 5 levels
 for(let i = 0; i <= 100; i += 5)
-	// One new song every 5 levels
 	settings_overrides.push({ "level": i, "setting": "music", "value": i / 5 });
 
 // Settings prefixed with item_* are arrays of indexes, the same item can be added multiple times to influence probabilities
@@ -268,7 +298,8 @@ const SETTINGS = {
 	"chat": 0.025,
 	"levels": NIGHTMARE_AFTER ? 100 : 99,
 	"previews": 2,
-	"target_chance": 0.25,
+	"target_count_min": 0,
+	"target_count_max": 0,
 	"target_height": 8,
 	"time": 1,
 	"chain": 3,
