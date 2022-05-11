@@ -430,14 +430,17 @@ class game_dialog {
 	}
 
 	// Advances to the next message or hides the dialog if this was the last entry, returns true if a valid message exists
-	// If this is an endgame dialog, refresh the window instead
+	// If this is an endgame dialog, refresh the window or close it for nightmare mode
 	advance() {
 		if(this.messages[this.index].next && this.index + this.messages[this.index].next >= 0 && this.index + this.messages[this.index].next < this.messages.length) {
 			this.index += this.messages[this.index].next;
 			this.read();
 			return true;
 		} else if(this.ending)
-			location.reload();
+			if(NIGHTMARE)
+				window.close();
+			else
+				location.reload();
 		this.hide();
 		return false;
 	}
@@ -473,8 +476,8 @@ class game_dialog {
 			this.element_label.style["text-shadow"] = (+DISPLAY_FONT_SHADOW + "px 0px 0px " + DISPLAY_FONT_SHADOW_COLOR) + ", " + (-DISPLAY_FONT_SHADOW + "px 0px 0px " + DISPLAY_FONT_SHADOW_COLOR) + ", " + ("0px " + +DISPLAY_FONT_SHADOW + "px 0px " + DISPLAY_FONT_SHADOW_COLOR) + ", " + ("0px " + -DISPLAY_FONT_SHADOW + "px 0px " + DISPLAY_FONT_SHADOW_COLOR);
 		if(!isNaN(this.messages[this.index].music))
 			audio.play_music(this.messages[this.index].music);
-		if(!isNaN(this.messages[this.index].sound))
-			audio.sound = "voice/" + DATA_VOICES[this.messages[this.index].sound];
+		if(this.messages[this.index].sound)
+			audio.sound = "voice/" + DATA_VOICES[this.messages[this.index].sound[Math.floor(Math.random() * this.messages[this.index].sound.length)]];
 		audio.play_sound();
 	}
 }
@@ -613,7 +616,7 @@ class game {
 		this.timer_interval = Math.max(this.settings.time / this.difficulty * 1000, 1);
 		this.timer = setInterval(this.update.bind(this), this.timer_interval);
 		this.update();
-		this.dialog.pick(2, this.difficulty, this.level, this.targets());
+		this.dialog.pick(2, this.difficulty, this.level, undefined);
 	}
 
 	// End the existing game
@@ -622,11 +625,13 @@ class game {
 		this.timer = undefined;
 		this.dialog.hide();
 
+		const targets = this.targets();
+		const color = targets.indexOf(Math.max(...targets));
 		if(success && this.level >= this.settings.levels) {
 			// The round was won and this was the final level
 			audio.sound = "game_won";
 			audio.play_sound();
-			this.dialog.pick(4, this.difficulty, this.level, this.targets());
+			this.dialog.pick(4, this.difficulty, this.level, color);
 		} else if(success) {
 			// The round was won
 			audio.sound = "game_continue";
@@ -634,15 +639,11 @@ class game {
 			this.level++;
 			this.element_label_level.innerHTML = Math.min(this.level, DISPLAY_LABEL_LIMIT);
 			this.game_start();
-		} else if(NIGHTMARE) {
-			// The game was lost in nightmare mode
-			window.close();
-			return;
 		} else {
 			// The game was lost
 			audio.sound = "game_lost";
 			audio.play_sound();
-			this.dialog.pick(3, this.difficulty, this.level, this.targets());
+			this.dialog.pick(3, this.difficulty, this.level, color);
 		}
 	}
 
