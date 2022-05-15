@@ -143,6 +143,7 @@ class audio {
 	static sound_busy = false;
 	static sound_default = "tick";
 	static sound = undefined;
+	static music_speed = 1;
 
 	// Setup the default channels and their settings
 	static configure() {
@@ -179,12 +180,11 @@ class audio {
 				audio.channel_music.src = data.audio[name].src;
 			if(audio.channel_music.paused)
 				audio.channel_music.play().catch(() => {});
-			audio.channel_music.playbackRate = NIGHTMARE ? 0.5 : 1;
+			audio.channel_music.playbackRate = audio.music_speed;
 		} else
 			audio.channel_music.pause();
 	}
 }
-audio.configure();
 
 // Visual effect, shows for a given amount of time then removes itself
 class effect {
@@ -437,7 +437,7 @@ class game_dialog {
 			this.read();
 			return true;
 		} else if(this.ending)
-			if(NIGHTMARE)
+			if(NIGHTMARE && NAME_PLAYER != NAME_PLAYER_NIGHTMARE)
 				window.close();
 			else
 				location.reload();
@@ -612,6 +612,7 @@ class game {
 			}
 		}
 
+		audio.music_speed = NIGHTMARE ? 0.5 : 1;
 		audio.play_music(this.settings.music);
 		this.timer_interval = Math.max(this.settings.time / this.difficulty * 1000, 1);
 		this.timer = setInterval(this.update.bind(this), this.timer_interval);
@@ -624,11 +625,14 @@ class game {
 		clearInterval(this.timer);
 		this.timer = undefined;
 		this.dialog.hide();
+		audio.music_speed = 1;
 
 		const targets = this.targets();
 		const color = targets.indexOf(Math.max(...targets));
 		if(success && this.level >= this.settings.levels) {
 			// The round was won and this was the final level
+			if(NIGHTMARE)
+				window.location.hash = NAME_PLAYER = NAME_PLAYER_NIGHTMARE;
 			audio.sound = "game_won";
 			audio.play_sound();
 			this.dialog.pick(4, this.difficulty, this.level, color);
@@ -944,4 +948,8 @@ class game {
 	}
 }
 
+// Configure stuff and load the data
+if(!window.location.hash)
+	window.location.hash = NAME_PLAYER;
+audio.configure();
 data.load_start();
