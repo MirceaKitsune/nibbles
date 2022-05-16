@@ -20,8 +20,9 @@ function html_create(parent, type, css, box) {
 	return element;
 }
 
-// Static class used to load and read assets universally
+// Static class used to load and read assets universally, also stores the active game instance
 class data {
+	static game = undefined;
 	static counter = 0;
 	static images = {};
 	static audio = {};
@@ -61,6 +62,10 @@ class data {
 
 	// Preload all assets used by the game
 	static load() {
+		// data.load_image("title_loading");
+		data.load_image("title");
+		data.load_image("title_difficulty");
+		data.load_image("title_difficulty_nightmare");
 		data.load_image("background_easy");
 		data.load_image("background_medium");
 		data.load_image("background_hard");
@@ -100,14 +105,43 @@ class data {
 	static load_start() {
 		data.element_canvas = html_create(document.body, "div", "canvas", [DISPLAY_CANVAS_BOX[0], DISPLAY_CANVAS_BOX[1], DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
 		data.element_title = html_create(data.element_canvas, "img", "title", [0, 0, DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
-		data.element_title.setAttribute("src", "img/title.gif");
+		data.element_title.setAttribute("src", "img/title_loading.gif");
+		data.element_title.style["display"] = "block";
 		data.element_title.onload = function() {
 			setTimeout(data.load, 1000);
 		}
 	}
 
-	// Key actions for the title screen
+	// Key actions after loading
 	static load_end_key() {
+		if(event.key == "Enter" || event.key == " ") {
+			document.removeEventListener("keydown", data.load_end_key, false);
+			data.selecting(true);
+		}
+	}
+
+	// All data has loaded, update the title screen and wait for the player to start the game
+	static load_end() {
+		audio.configure();
+		data.element_title.setAttribute("src", data.images["title"].src);
+		document.addEventListener("keydown", data.load_end_key, false);
+	}
+
+	// Shut down the game and return to the title screen, refresh or close the window in or after nightmare mode to apply special settings
+	static reset() {
+		if(NIGHTMARE)
+			location.reload();
+		else if(NIGHTMARE_AFTER)
+			window.close();
+		else {
+			data.game.remove();
+			data.game = undefined;
+			data.selecting(true);
+		}
+	}
+
+	// Key actions for the title screen difficulty selector
+	static selecting_key() {
 		var difficulty = undefined;
 		if((event.key == "ArrowLeft" || event.key == "a" || event.key == "A") && !NIGHTMARE)
 			difficulty = 0.5;
@@ -117,22 +151,28 @@ class data {
 			difficulty = 1;
 		if((event.key == "ArrowDown" || event.key == "s" || event.key == "S") && NIGHTMARE)
 			difficulty = 2;
-
 		if(!isNaN(difficulty)) {
-			document.removeEventListener("keydown", data.load_end_key, false);
-			data.element_title.remove();
-			data.element_title = undefined;
-			new game(data.element_canvas, SETTINGS, difficulty);
+			data.selecting(false);
+			data.game = new game(data.element_canvas, SETTINGS, difficulty);
 		}
 	}
 
-	// All data has loaded, update the title screen and wait for the player to start the game
-	static load_end() {
-		if(NIGHTMARE)
-			data.element_title.setAttribute("src", "img/title_loaded_nightmare.gif");
-		else
-			data.element_title.setAttribute("src", "img/title_loaded.gif");
-		document.addEventListener("keydown", data.load_end_key, false);
+	// Enable or disable difficulty selection and the title screen with it
+	static selecting(show) {
+		if(show) {
+			document.addEventListener("keydown", data.selecting_key, false);
+			if(NIGHTMARE) {
+				window.location.hash = NAME_PLAYER = NAME_PLAYER_DEFAULT;
+				data.element_title.setAttribute("src", data.images["title_difficulty_nightmare"].src);
+				audio.play_music(MUSIC_TITLE_NIGHTMARE);
+			} else {
+				window.location.hash = NAME_PLAYER;
+				data.element_title.setAttribute("src", data.images["title_difficulty"].src);
+				audio.play_music(MUSIC_TITLE);
+			}
+		} else
+			document.removeEventListener("keydown", data.selecting_key, false);
+		data.element_title.style["display"] = show ? "block" : "none";
 	}
 }
 
@@ -398,10 +438,10 @@ class game_dialog {
 	hide() {
 		clearInterval(this.timer);
 		clearTimeout(this.timeout);
-		this.interactive = false;
-		this.ending = false;
 		this.timer = undefined;
 		this.timeout = undefined;
+		this.interactive = false;
+		this.ending = false;
 		this.index = undefined;
 		this.element_foreground.style["display"] = "none";
 		this.element_label.innerHTML = "";
@@ -437,10 +477,7 @@ class game_dialog {
 			this.read();
 			return true;
 		} else if(this.ending)
-			if(NIGHTMARE && NAME_PLAYER != NAME_PLAYER_NIGHTMARE)
-				window.close();
-			else
-				location.reload();
+			data.reset();
 		this.hide();
 		return false;
 	}
@@ -627,16 +664,18 @@ class game {
 		this.dialog.hide();
 		audio.music_speed = 1;
 
+		// If this level is set up to contains no targets, losing always counts as success
+		const won = success || this.settings.target_count_max == 0;
 		const targets = this.targets();
 		const color = targets.indexOf(Math.max(...targets));
-		if(success && this.level >= this.settings.levels) {
+		if(won && this.level >= this.settings.levels) {
 			// The round was won and this was the final level
 			if(NIGHTMARE)
 				window.location.hash = NAME_PLAYER = NAME_PLAYER_NIGHTMARE;
 			audio.sound = "game_won";
 			audio.play_sound();
 			this.dialog.pick(4, this.difficulty, this.level, color);
-		} else if(success) {
+		} else if(won) {
 			// The round was won
 			audio.sound = "game_continue";
 			audio.play_sound();
@@ -884,10 +923,10 @@ class game {
 	// Fires when a key is pressed
 	key(event) {
 		// If an interactive dialog has focus, use Enter / Space to advance it then return
-		// Resume playing the normal level music if a song was previously set by the dialog
+		// Resume playing the normal level music if a song was previously set by the dialog and the match is still going
 		if(this.dialog.interactive) {
 			if(event.key == "Enter" || event.key == " ")
-				if(!this.dialog.advance())
+				if(!this.dialog.advance() && this.timer)
 					audio.play_music(this.settings.music);
 			return;
 		} else if(!this.timer || event.repeat)
@@ -948,8 +987,4 @@ class game {
 	}
 }
 
-// Configure stuff and load the data
-if(!window.location.hash)
-	window.location.hash = NAME_PLAYER;
-audio.configure();
 data.load_start();

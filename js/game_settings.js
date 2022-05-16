@@ -13,6 +13,8 @@ const DISPLAY_FONT_SHADOW = DISPLAY_CANVAS_ZOOM;
 const DISPLAY_FONT_SHADOW_COLOR = "#000000";
 const DISPLAY_LABEL_LIMIT = 9999;
 const DISPLAY_LABEL_SPEED = 0.0125;
+const MUSIC_TITLE = 25;
+const MUSIC_TITLE_NIGHTMARE = 26;
 const ITEM_COLOR = ["red", "yellow", "green", "cyan", "blue", "pink", "white", "black"];
 const ITEM_SPRITE_TARGET = "target";
 const ITEM_SPRITE_SINGLE = "center";
@@ -20,14 +22,15 @@ const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
 const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
 const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
 const DATA_BACKGROUNDS = ["easy", "medium", "hard", "nightmare"];
-const DATA_DIALOGS = ["random_single", "random_multi_start", "random_multi", "random_multi_end", "level_single", "level_multi_start", "level_multi", "level_multi_end", "game_start_nightmare", "game_start_1", "game_start_2", "game_start_3", "game_start_4", "game_start_5", "game_start_6", "game_end_lose_red", "game_end_lose_yellow", "game_end_lose_green", "game_end_lose_cyan", "game_end_lose_blue", "game_end_lose_pink", "game_end_lose_white", "game_end_lose_black", "game_end_lose", "game_end_win_0", "game_end_win_1", "game_end_win_2_easy", "game_end_win_2_medium", "game_end_win_2_hard", "game_end_win_2_nightmare", "game_end_win_3_nightmare", "game_end_win_4_nightmare"];
+const DATA_DIALOGS = ["random_single", "random_multi_start", "random_multi", "random_multi_end", "level_single", "level_multi_start", "level_multi", "level_multi_end", "game_start_nightmare", "game_start_1", "game_start_2", "game_start_3", "game_start_4", "game_start_5", "game_start_6", "game_end_lose_red", "game_end_lose_yellow", "game_end_lose_green", "game_end_lose_cyan", "game_end_lose_blue", "game_end_lose_pink", "game_end_lose_white", "game_end_lose_black", "game_end_lose", "game_end_win_0", "game_end_win_1", "game_end_win_2_easy", "game_end_win_2_medium", "game_end_win_2_hard", "game_end_win_2_nightmare", "game_end_win_3_nightmare", "game_end_win_4_nightmare", "game_end_win_secret_0", "game_end_win_secret_1"];
 const DATA_VOICES = ["character_color_red", "character_color_yellow", "character_color_green", "character_color_cyan", "character_color_blue", "character_color_pink", "character_color_white", "character_color_black", "character_random_1", "character_random_2", "character_random_3", "character_random_4", "player_random_1", "player_random_2", "player_random_3", "player_random_4", "default_random_1", "default_random_2"];
-const DATA_MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "agressive_action", "unknown_space", "hells_god_1", "hells_god_2", "hells_god_3", "hells_god_4"];
+const DATA_MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "agressive_action", "unknown_space", "hells_god_1", "hells_god_2", "hells_god_3", "hells_god_4", "revelation_synth", "revelation"];
 
 // Character name is fixed, player name can be set via URL parameter
 // Nightmare mode is unlocked when the player uses the same name as the main character
-var NAME_PLAYER = window.location.hash.substring(1).slice(0, 8) || "Napi";
+const NAME_PLAYER_DEFAULT = "Napi";
 const NAME_PLAYER_NIGHTMARE = "Selbbin";
+var NAME_PLAYER = window.location.hash.substring(1).slice(0, 8) || NAME_PLAYER_DEFAULT;
 const NAME_CHARACTER = "Nibbles";
 const NIGHTMARE = NAME_PLAYER.toLowerCase() == NAME_CHARACTER.toLowerCase();
 const NIGHTMARE_AFTER = NAME_PLAYER.toLowerCase() == NAME_PLAYER_NIGHTMARE.toLowerCase();
@@ -101,32 +104,36 @@ const dialog_presets = {
 	"type_end_lose_5_1": {"trigger_at": 0, "trigger_color": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 20, "color": "#ffffff"},
 	"type_end_lose_5_2": {"trigger_at": 0, "trigger_color": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 23, "color": "#ffffff"},
 	"type_end_lose_5_3": {"trigger_at": 0, "trigger_color": undefined, "next": 0, "interactive": true, "height": dialog_height_interactive, "background": 23, "color": "#ff00ff"},
-	"type_end_lose_6_0": {"trigger_at": 3, "trigger_color": [6], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 21, "color": "#ffffff", "music": 22},
+	"type_end_lose_6_0": {"trigger_at": 3, "trigger_color": [6], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 21, "color": "#ffffff", "music": 23},
 	"type_end_lose_6_1": {"trigger_at": 0, "trigger_color": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 21, "color": "#ffffff"},
 	"type_end_lose_6_2": {"trigger_at": 0, "trigger_color": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 23, "color": "#ffffff"},
 	"type_end_lose_6_3": {"trigger_at": 0, "trigger_color": undefined, "next": 0, "interactive": true, "height": dialog_height_interactive, "background": 23, "color": "#ffffff"},
-	"type_end_lose_7_0": {"trigger_at": 3, "trigger_color": [7], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 22, "color": "#ffffff", "music": 22},
+	"type_end_lose_7_0": {"trigger_at": 3, "trigger_color": [7], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 22, "color": "#ffffff", "music": 23},
 	"type_end_lose_7_1": {"trigger_at": 0, "trigger_color": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 22, "color": "#ffffff"},
 	"type_end_lose_7_2": {"trigger_at": 0, "trigger_color": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 23, "color": "#ffffff"},
 	"type_end_lose_7_3": {"trigger_at": 0, "trigger_color": undefined, "next": 0, "interactive": true, "height": dialog_height_interactive, "background": 23, "color": "#7f7f7f"},
-	"type_end_win_easy_0": {"trigger_at": 4, "trigger_difficulty": [0], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 24, "color": "#ffffff", "music": 23},
+	"type_end_win_easy_0": {"trigger_at": NIGHTMARE_AFTER ? 0 : 4, "trigger_difficulty": [0], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 24, "color": "#ffffff", "music": 24},
 	"type_end_win_easy_1": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 25, "color": "#ffffff"},
 	"type_end_win_easy_2": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 26, "color": "#ffffff"},
 	"type_end_win_easy_3": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 0, "interactive": true, "height": dialog_height_interactive, "background": 26, "color": "#ffffff"},
-	"type_end_win_medium_0": {"trigger_at": 4, "trigger_difficulty": [1], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 24, "color": "#ffffff", "music": 23},
+	"type_end_win_medium_0": {"trigger_at": NIGHTMARE_AFTER ? 0 : 4, "trigger_difficulty": [1], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 24, "color": "#ffffff", "music": 24},
 	"type_end_win_medium_1": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 25, "color": "#ffffff"},
 	"type_end_win_medium_2": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 27, "color": "#ffffff"},
 	"type_end_win_medium_3": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 0, "interactive": true, "height": dialog_height_interactive, "background": 27, "color": "#ffffff"},
-	"type_end_win_hard_0": {"trigger_at": 4, "trigger_difficulty": [2], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 24, "color": "#ffffff", "music": 23},
+	"type_end_win_hard_0": {"trigger_at": NIGHTMARE_AFTER ? 0 : 4, "trigger_difficulty": [2], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 24, "color": "#ffffff", "music": 24},
 	"type_end_win_hard_1": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 25, "color": "#ffffff"},
 	"type_end_win_hard_2": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 28, "color": "#ffffff"},
 	"type_end_win_hard_3": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 0, "interactive": true, "height": dialog_height_interactive, "background": 28, "color": "#ffffff"},
-	"type_end_win_nightmare_0": {"trigger_at": 4, "trigger_difficulty": [3], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 24, "color": "#ffffff", "music": 24},
+	"type_end_win_nightmare_0": {"trigger_at": NIGHTMARE_AFTER ? 0 : 4, "trigger_difficulty": [3], "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 24, "color": "#ffffff", "music": 24},
 	"type_end_win_nightmare_1": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 25, "color": "#ffffff"},
 	"type_end_win_nightmare_2": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 29, "color": "#ffffff"},
 	"type_end_win_nightmare_3": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 30, "color": "#ffffff"},
 	"type_end_win_nightmare_4": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 31, "color": "#ffffff"},
 	"type_end_win_nightmare_5": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 0, "interactive": true, "height": dialog_height_interactive, "background": 31, "color": "#ffffff"},
+	"type_end_win_secret_0": {"trigger_at": NIGHTMARE_AFTER ? 4 : 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 32, "color": "#ffffff", "music": 20},
+	"type_end_win_secret_1": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 32, "color": "#ffffff"},
+	"type_end_win_secret_2": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 1, "interactive": true, "height": dialog_height_interactive, "background": 33, "color": "#ffffff"},
+	"type_end_win_secret_3": {"trigger_at": 0, "trigger_difficulty": undefined, "next": 0, "interactive": true, "height": dialog_height_interactive, "background": 33, "color": "#ffffff"},
 	// Actor presets: Configures color triggers, character names, text color and sound
 	// 0 = Character, 1 = Player, 2 = Default... the character includes colors representing each entry in ITEM_COLOR
 	"actor_0_0": {"trigger_color": [0], "sound": [0], "color": "#ff0000", "name": NAME_CHARACTER},
@@ -173,7 +180,6 @@ const dialog_presets = {
 	"filter_level_60_89": {"trigger_level": [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89]},
 	"filter_level_90_99": {"trigger_level": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]},
 	// Difficulty filters
-	"filter_difficulty_any": {"trigger_difficulty": undefined},
 	"filter_difficulty_standard": {"trigger_difficulty": [0, 1, 2]},
 	"filter_difficulty_easy": {"trigger_difficulty": [0]},
 	"filter_difficulty_medium": {"trigger_difficulty": [1]},
@@ -263,9 +269,17 @@ const settings_dialog = [
 	get_dialog_message(["actor_2", "type_end_win_nightmare_3"], "You're stuck like this forever then. Congratulations, enjoy your break! I can tell you're gonna have so much fun together..."),
 	get_dialog_message(["actor_2", "type_end_win_nightmare_4"], "So... much... fun. Yep, that's your reward for all the effort you made, hope you're proud. Now close this tab and return later."),
 	get_dialog_message(["actor_2", "type_end_win_nightmare_5"], "ENDING 12 / 12:\n\nGOOD DREAM\n\n01001001 00100111 01001101 00100000 01001000 01001111 01001101 01000101"),
+	get_dialog_message(["actor_0", "type_end_win_secret_0"], "Ah. It seems our time here is up. I need to get going... I know you do as well soon."),
+	get_dialog_message(["actor_0", "type_end_win_secret_1"], "We're both constrained by circumstance at different scales. I can't take you with me, you can't leave. You can't fight fate."),
+	get_dialog_message(["actor_0", "type_end_win_secret_1"], "This little adventure was fun, wasn't it? I hope you'll think of that. Maybe... maybe my knowledge is wrong."),
+	get_dialog_message(["actor_0", "type_end_win_secret_1"], "Don't worry: We may meet again a long time from now. At that time I won't remember everything that went on here."),
+	get_dialog_message(["actor_0", "type_end_win_secret_2"], "Hey... " + NAME_PLAYER_DEFAULT + "? Please don't do anything thoughtless while I'm away. Even if I know I won't know but..."),
+	get_dialog_message(["actor_0", "type_end_win_secret_2"], "And... don't use this name again? Forget this as I will. You found everything there was to find in this one universe."),
+	get_dialog_message(["actor_0", "type_end_win_secret_2"], "Until we meet again... those of you that match, even those that only happened to pass by. I will see you in the stars someday."),
+	get_dialog_message(["actor_2", "type_end_win_secret_3"], "ENDING 13 / 12:\n\nNaN"),
 	// Game start: One message for nightmare mode, the full chain for normal difficulties
 	get_dialog_message(["actor_2", "type_start_0", "filter_difficulty_nightmare"], "You already know all this by now, so let's skip to the painful part you're here for."),
-	get_dialog_message(["actor_2", "type_start_1", "filter_difficulty_standard"], "Once upon a time there lived a kid called " + NAME_PLAYER + ". One night " + NAME_PLAYER + " went outside for a walk alone around the lake."),
+	get_dialog_message(["actor_2", "type_start_1", "filter_difficulty_standard"], "Once upon a time there " + (NIGHTMARE_AFTER ? "couldn't live" : "lived")  + " a kid called " + NAME_PLAYER + ". One night " + NAME_PLAYER + " went outside for a walk alone around the lake."),
 	get_dialog_message(["actor_2", "type_start_2", "filter_difficulty_standard"], "Suddenly " + NAME_PLAYER + " saw strange lights in the sky. As they turned around " + NAME_PLAYER + " was greeted to the sight of a flying saucer landing!"),
 	get_dialog_message(["actor_2", "type_start_3", "filter_difficulty_standard"], "Out came a giant cat nearly twice the size of " + NAME_PLAYER + ". The kitty looked around curiously, making their way toward the kid."),
 	get_dialog_message(["actor_2", "type_start_4", "filter_difficulty_standard"], "Unfortunately for " + NAME_PLAYER + " the cat confuses humans with potato people which live on their planet and are considered highly edible."),
@@ -305,11 +319,11 @@ const settings_dialog = [
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_5"], "I'm seeing " + ITEM_COLOR[2] + " ones now. I think they're causing leftover pills to turn into more blobs? This ain't good."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_5"], "Try some of the plants in my front yard. We typically use those to make tea: Maybe they help calm down your... system."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_5"], "I'll sniff them out and put some in the pills. Then I can boil my very own " + NAME_PLAYER + " tea in my belly!"),
-	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_5"], "Or don't, that's also an option. I'd rather you keep in touch more closely, handling three colors at once ain't easy."),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_5"], "Or don't, that's also an option. I'd rather you keep in touch more closely, handling three colors at once won't be easy."),
 	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_10"], "Oh wow: The plants worked extremely well! So much so that I feel... better than ever!"),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "Is that why " + ITEM_COLOR[3] + " ones are popping up now? What do those mean for your \"system\"?"),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "There's such a thing as feeling too good. My system could kick into overdrive and I might lose you."),
-	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "They might turn out helpful: It seems to be causing some of the other blobs to die out on their own which makes my job easier."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "They might turn out helpful: It seems to be causing some of the blobs to die out on their own which makes my job easier."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "Yeaaaah but they shouldn't be mixed with the wrong stuff: There's only so many chemicals we can both handle."),
 	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_10"], "Let's give up on the " + ITEM_COLOR[0] + " ones then: I don't need you snapping and rage-digesting me."),
 	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_15"], "Purr... I feel tired. Your " + ITEM_COLOR[3] + " colored pills helped my body relax a bit too much."),
