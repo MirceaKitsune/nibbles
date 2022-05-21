@@ -172,6 +172,10 @@ const dialog_presets = {
 	"filter_level_85": {"trigger_level": [85]},
 	"filter_level_90": {"trigger_level": [90]},
 	"filter_level_95": {"trigger_level": [95]},
+	"filter_level_96": {"trigger_level": [96]},
+	"filter_level_97": {"trigger_level": [97]},
+	"filter_level_98": {"trigger_level": [98]},
+	"filter_level_99": {"trigger_level": [99]},
 	"filter_level_100": {"trigger_level": [100]},
 	// Level filters for level ranges
 	"filter_level_0_4": {"trigger_level": [0, 1, 2, 3, 4]},
@@ -200,66 +204,76 @@ function get_dialog_message(presets, text) {
 
 // This contains the chat messages shown when winning / losing, in between levels, or idly during the game
 const settings_dialog = [
-	// Game lost: 8 different endings based on the predominant target color at the moment of losing
+	// Game lost, red ending
 	get_dialog_message(["actor_2", "type_end_lose_0_0"], "Uh oh: Looks like you got " + NAME_CHARACTER + " very angry. Which probably wasn't your fault, but not good for you regardless."),
 	get_dialog_message(["actor_2", "type_end_lose_0_1"], "The cat decides it's not worth the effort saving your life. You hear what's probably the equivalent of \"fuck you\" in their language."),
 	get_dialog_message(["actor_2", "type_end_lose_0_1"], "You're left inside to be digested or vaporized or assimilated or whatever. If you behave you may have a few days left to reflect."),
 	get_dialog_message(["actor_2", "type_end_lose_0_2"], "But hey, look at the bright side: At least no one can tell you what to do any more! No work , no obligations... how cool is that?"),
 	get_dialog_message(["actor_2", "type_end_lose_0_2"], "You spend your last moments yelling offensive slurs since no one can ban you here. " + NAME_CHARACTER + " finds that very funny."),
 	get_dialog_message(["actor_2", "type_end_lose_0_3"], "ENDING 1 / 12:\n\nRED SUNRISE"),
+	// Game lost, yellow ending
 	get_dialog_message(["actor_2", "type_end_lose_1_0"], "Seems " + NAME_CHARACTER + " couldn't handle how utterly fucked your planet is: He snaps and runs away scream-meowing in panic."),
 	get_dialog_message(["actor_2", "type_end_lose_1_1"], "Due to the shock his stomach shuts tight permanently. He apologizes profusely later that day, but you're still stuck there forever."),
 	get_dialog_message(["actor_2", "type_end_lose_1_1"], "And no, there's no teleporter to get you out. Seriously couldn't you tell " + NAME_CHARACTER + " was just trolling you with that?"),
 	get_dialog_message(["actor_2", "type_end_lose_1_2"], "You go on to have a happy life in there. " + NAME_CHARACTER + " offers you a tablet connected to kittynet, you realize it's all you ever needed."),
 	get_dialog_message(["actor_2", "type_end_lose_1_3"], "ENDING 2 / 12:\n\nLEMON YELLOW"),
+	// Game lost, green ending
 	get_dialog_message(["actor_2", "type_end_lose_2_0"], "Unfortunately " + NAME_CHARACTER + " got very sick during the process of saving you. He was okay a few days later... the same can't be said for you."),
 	get_dialog_message(["actor_2", "type_end_lose_2_1"], "Their stomach goes haywire and starts to absorb you into its fabric. Within minutes you're already too glued to be separated."),
 	get_dialog_message(["actor_2", "type_end_lose_2_2"], "Technically you aren't gonna die? You'll like, get absorbed into the walls and spend your life just staring into the cat's gullet 24/7."),
 	get_dialog_message(["actor_2", "type_end_lose_2_2"], "You won't even need to be fed or given air! It might get boring after a while though. I guess this is what being a tree feels like."),
 	get_dialog_message(["actor_2", "type_end_lose_2_3"], "ENDING 3 / 12:\n\nLEAF GREEN"),
+	// Game lost, cyan ending
 	get_dialog_message(["actor_2", "type_end_lose_3_0"], "The pills cause " + NAME_CHARACTER + "'s body to go in overdrive. While we're happy this ends in him being healthy, you are a little bit screwed."),
 	get_dialog_message(["actor_2", "type_end_lose_3_1"], "Their stomach is so efficient it pulls you down into its lower parts. You aren't harmed but can't ever climb back up again either."),
 	get_dialog_message(["actor_2", "type_end_lose_3_2"], "You spend your life exploring a gooey fleshy maze. If you could you'd start a club in there and dance with all the lost items."),
 	get_dialog_message(["actor_2", "type_end_lose_3_3"], "ENDING 4 / 12:\n\nCYAN SKY"),
+	// Game lost, blue ending
 	get_dialog_message(["actor_2", "type_end_lose_4_0"], NAME_CHARACTER + " found your rescue attempt so boring they fell asleep while saving you. You hope they wake up quickly and soon enough they do."),
 	get_dialog_message(["actor_2", "type_end_lose_4_1"], "Just one problem: The sleep was so deep that " + NAME_CHARACTER + " forgot all about you. With the translator down they can't hear you either."),
 	get_dialog_message(["actor_2", "type_end_lose_4_1"], "You scream and kick to get their attention but are so puny it's unnoticeable. By now the kitty must have returned to their home planet."),
 	get_dialog_message(["actor_2", "type_end_lose_4_2"], "You manage to adapt, living off food that ends up in there with you. But it's boring since not even the creature you're in knows you exist."),
 	get_dialog_message(["actor_2", "type_end_lose_4_2"], "You wonder if by sheer look they'll someday discover you. Wouldn't bet on it though: You seem pretty lost to the comforting silence in there."),
 	get_dialog_message(["actor_2", "type_end_lose_4_3"], "ENDING 5 / 12:\n\nBLUE LAKE"),
+	// Game lost, pink ending
 	get_dialog_message(["actor_2", "type_end_lose_5_0"], "Of all the weird fates that could befall you, you just had to pick the weirdest one. Should I even ask if you did this on purpose?"),
 	get_dialog_message(["actor_2", "type_end_lose_5_1"], NAME_CHARACTER + " decides it's foolish to get you out given all the happy fun they can have keeping you in... look it's tragic for you okay?!"),
 	get_dialog_message(["actor_2", "type_end_lose_5_1"], "No one knows what happens to you. Even if they did they probably couldn't say... not without getting this Git repository banned."),
 	get_dialog_message(["actor_2", "type_end_lose_5_2"], "I... think you go on to have a happy life. Not gonna assume. Actually the fact that you're here is an indication so we're optimistic."),
 	get_dialog_message(["actor_2", "type_end_lose_5_2"], "You often ponder if God will allow you in heaven when you eventually die. You're lucky though: God is secretly hip with this. Le sigh."),
 	get_dialog_message(["actor_2", "type_end_lose_5_3"], "ENDING 6 / 12:\n\nGUMMY PINK"),
+	// Game lost, white ending
 	get_dialog_message(["actor_2", "type_end_lose_6_0"], "There was a flash of light. It's all one can remember happening. After that everything was light. This is but a nexus point."),
 	get_dialog_message(["actor_2", "type_end_lose_6_1"], "You remember all things that happened and didn't happen. It's hard to tell which is which. You sense you will return here."),
 	get_dialog_message(["actor_2", "type_end_lose_6_1"], "Don't mind the others: Some were grumpy, others were just curious. Taking on so many can be hard, but they both did a great job."),
 	get_dialog_message(["actor_2", "type_end_lose_6_3"], "ENDING 7 / 12:\n\nSNOW WHITE"),
+	// Game lost, black ending
 	get_dialog_message(["actor_2", "type_end_lose_7_0"], "ERROR: ZERO STATE, MEMORY BLANK. RUN IS INVALID, CANNOT FORM NEURAL PATH. TIMELINE " + Math.floor(Math.random() * 10000) + " WILL BE FORGOTTEN AFTER RESET."),
 	get_dialog_message(["actor_2", "type_end_lose_7_1"], "WARNING: PAIN NOT ASSOCIATED WITH MEMORY. PAIN YOU CAUSED, PAIN YOU RECEIVED... CANNOT BE DISTINGUISHED IN SOUL STORAGE."),
 	get_dialog_message(["actor_2", "type_end_lose_7_1"], "NOTICE: 100 IS INVALID. DATA INCOMPATIBLE WITH USER: PLEASE DO NOT RETURN TO AVOID FURTHER INCONSISTENCIES."),
 	get_dialog_message(["actor_2", "type_end_lose_7_3"], "ENDING 8 / 12:\n\nBLACK SPACE\n\n01010010 01000101 01001101 01000101 01001101 01000010 01000101 01010010"),
-	// Game won: 4 different endings based on the difficulty
+	// Game won, easy ending
 	get_dialog_message(["actor_2", "type_end_win_easy_0"], "Suddenly you feel your puny body lifted into the air like a feather. There's nothing you can do but go with the flow."),
 	get_dialog_message(["actor_2", "type_end_win_easy_1"], "Like a child reaching the end of a water slide, you're thrown to the ground in a puddle of kitty tummy gum."),
 	get_dialog_message(["actor_2", "type_end_win_easy_2"], "You immediately get up and walk away, not even turning to say goodbye to " + NAME_CHARACTER + ". He waves at you sadly as you disappear."),
 	get_dialog_message(["actor_2", "type_end_win_easy_2"], "You chose the easiest way out after all. Maybe you'll miss them and regret not even saying goodbye, I know some do."),
 	get_dialog_message(["actor_2", "type_end_win_easy_2"], "But hey: You survived and won't be spending the rest of your life in a belly! Now you can finally get back to your grueling chores."),
 	get_dialog_message(["actor_2", "type_end_win_easy_3"], "ENDING 9 / 12:\n\nEASY HACK"),
+	// Game won, medium ending
 	get_dialog_message(["actor_2", "type_end_win_medium_0"], "You suddenly feel your body being pushed up. You take the opportunity and thrust yourself upward."),
 	get_dialog_message(["actor_2", "type_end_win_medium_1"], "Like a driver thrown out of a moving car, you fall to the ground in a pool of cat belly juice."),
 	get_dialog_message(["actor_2", "type_end_win_medium_2"], NAME_CHARACTER + " picks you up and holds you, happy to see that you're safe. He isn't sure how you feel... to be fair you aren't either."),
 	get_dialog_message(["actor_2", "type_end_win_medium_2"], "You chose to handle the situation methodically and without forcing " + NAME_CHARACTER + " during the process. They're grateful for that."),
 	get_dialog_message(["actor_2", "type_end_win_medium_2"], "Eventually it's time to say your goodbyes. You regret they couldn't stay longer but are happy to remember your adventures."),
 	get_dialog_message(["actor_2", "type_end_win_medium_3"], "ENDING 10 / 12:\n\nMEDIUM SIZED"),
+	// Game won, hard ending
 	get_dialog_message(["actor_2", "type_end_win_hard_0"], "As you hang on with all your might, you feel your body being propelled upward. Like a superhero you jump into the exit above you."),
 	get_dialog_message(["actor_2", "type_end_win_hard_1"], "Like a fighter shot out of a tank, you land on the ground in a lake of alien stomach acid."),
 	get_dialog_message(["actor_2", "type_end_win_hard_2"], "To their complete surprise, your first action as you get up is giving " + NAME_CHARACTER + " a big hug. They don't even know how to respond."),
 	get_dialog_message(["actor_2", "type_end_win_hard_2"], "You chose to make things harder for yourself and stay in there for longer. Maybe you enjoyed it, or perhaps you liked the challenge."),
 	get_dialog_message(["actor_2", "type_end_win_hard_2"], "Sadly " + NAME_CHARACTER + " can't take you home with them. They suggest that if you ever feel lonely, try saying their name out loud next time."),
 	get_dialog_message(["actor_2", "type_end_win_hard_3"], "ENDING 11 / 12:\n\nHARD SHELL"),
+	// Game won, secret ending
 	get_dialog_message(["actor_2", "type_end_win_nightmare_0"], "No... impossible, it cannot be. No one can get this far on their own, you must have changed the source code! Don't... get... out..."),
 	get_dialog_message(["actor_2", "type_end_win_nightmare_1"], "Argh! Do you have any idea what you've done? This mode disabled their failsafe, the one thing that kept your DNA shielded!"),
 	get_dialog_message(["actor_2", "type_end_win_nightmare_1"], "Have your horror ending then: Now you're gonna mutate! Either you'll become a giant tumor or shift into the monstrosity you..."),
@@ -277,7 +291,7 @@ const settings_dialog = [
 	get_dialog_message(["actor_0", "type_end_win_secret_2"], "And... don't use this name again? Forget this as I will. You found everything there was to find in this one universe."),
 	get_dialog_message(["actor_0", "type_end_win_secret_2"], "Until we meet again... those of you that match, even those that only happened to pass by. I will see you in the stars someday."),
 	get_dialog_message(["actor_2", "type_end_win_secret_3"], "ENDING 13 / 12:\n\nNaN"),
-	// Game start: One message for nightmare mode, the full chain for normal difficulties
+	// Game start
 	get_dialog_message(["actor_2", "type_start_0", "filter_difficulty_nightmare"], "You already know all this by now, so let's skip to the painful part you're here for."),
 	get_dialog_message(["actor_2", "type_start_1", "filter_difficulty_standard"], "Once upon a time there " + (NIGHTMARE_AFTER ? "couldn't live" : "lived")  + " a kid called " + NAME_PLAYER + ". One night " + NAME_PLAYER + " went outside for a walk alone around the lake."),
 	get_dialog_message(["actor_2", "type_start_2", "filter_difficulty_standard"], "Suddenly " + NAME_PLAYER + " saw strange lights in the sky. As they turned around " + NAME_PLAYER + " was greeted to the sight of a flying saucer landing!"),
@@ -288,31 +302,34 @@ const settings_dialog = [
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard"], "Uhm... oops? Is \"sorry about that\" an appropriate term in your culture?"),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard"], "You have got to kidding me. I was literally eaten by a giant cat from outer space! This must be the weirdest place ever."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard"], "I thought you were a potato. Your kind looks just like one, even your perceived level of intelligence is highly similar."),
-	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard"], "Gee, thanks. Do you eat everyone before you meet them? Also is this how I die or are you going to let me out now?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard"], "Gee, thanks. Do you eat everyone before meeting them? Also is this how I die or are you going to let me out now?"),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard"], "Weeeel it's a little complicated. It's easy for us to eat things but harder to get them out... safely. Maybe some laxatives..."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard"], "Not that way, my people have standards! You have to cough me up. Can't you just teleport me out or something?"),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard"], "I can try. You might be gibbed to pieces if the battery is low, but I think I charged it last time so..."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard"], "No! There's some medicine in one of the closets, maybe take some of the large pills and see if that works."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard"], "Good idea, I could use the treatment to adjust. I should pull up my X-ray machine just in case."),
 	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard"], "At least I get to kill my boredom by sorting pills. You can guide me if you think it helps I guess."),
-	// Level milestones, warmup stage:
+	// Level 1
 	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_1"], "What was that thing?! I threw a bunch of pills at it and it went away."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_1"], "Ugh. The tiny blobs? They form as coping machanism, each type transfers different errors out of the system."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_1"], "That's a lesson in alien anatomy I didn't need. Everything okay? There seems to be more of them popping up."),
 	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_1"], "They're making me feel... errored out. One moment I'm pissed off the other I'm extremely anxious."),
+	// Level 2
 	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_2"], "I feel trippy. I've been to many planets but this one's really taking its toll on me."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_2"], "It must be the pills, this all started when you took them. Maybe we should stop the treatment..."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_2"], "It's not that: Your plane's low frequency is messing with my systems. The pills seem to help my regulators."),
 	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_2"], "Frequency... systems... regulators? This is going to be another long night of playing doctor."),
+	// Level 3
 	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_3"], "Can't you just spit those blobs out? Earth cats cough up hairballs all the time."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_3"], "They're appearing faster than usual. Our stomachs also tighten shut when there's prey inside... no offense."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_3"], "Wonderful, so I'm completely fucked unless we find a solution fast. Wonder if I'll melt or get vaporized."),
 	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_3"], "Relax: At worst you'll get assimilated. I think... not sure what happens to double helix critters."),
+	// Level 4
 	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_4"], "Okay... I don't think you randomly chugging pills is getting me out of here any sooner."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_4"], "Yeaaaah we should probably take this more methodically next time. See which substance affects my system in what way."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_4"], "Well, since I'll be stuck here for a while, may as well ask what your name is. I'm " + NAME_PLAYER + "."),
 	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_4"], "You couldn't pronounce mine with your vocal cords. Given the circumstances, I guess you can call me... " + NAME_CHARACTER + "!"),
-	// Level milestones, 1st stage:
+	// Level 5 (1st stage)
 	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_5"], "Okay... this is what we know so far: The " + ITEM_COLOR[0] + " blobs make you angry, " + ITEM_COLOR[1] + " ones make you scared."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_5"], "And thankfully pills of each color make them go away! I could feel my heart racing or skipping beats until today."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_5"], "Only problem is the whole thing has been making me sick. And trust me you don't want that getting out of paw in there."),
@@ -320,12 +337,14 @@ const settings_dialog = [
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_5"], "Try some of the plants in my front yard. We typically use those to make tea: Maybe they help calm down your... system."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_5"], "I'll sniff them out and put some in the pills. Then I can boil my very own " + NAME_PLAYER + " tea in my belly!"),
 	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_5"], "Or don't, that's also an option. I'd rather you keep in touch more closely, handling three colors at once won't be easy."),
+	// Level 10
 	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_10"], "Oh wow: The plants worked extremely well! So much so that I feel... better than ever!"),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "Is that why " + ITEM_COLOR[3] + " ones are popping up now? What do those mean for your \"system\"?"),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "There's such a thing as feeling too good. My system could kick into overdrive and I might lose you."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "They might turn out helpful: It seems to be causing some of the blobs to die out on their own which makes my job easier."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_10"], "Yeaaaah but they shouldn't be mixed with the wrong stuff: There's only so many chemicals we can both handle."),
 	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_10"], "Let's give up on the " + ITEM_COLOR[0] + " ones then: I don't need you snapping and rage-digesting me."),
+	// Level 15
 	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_15"], "Purr... I feel tired. Your " + ITEM_COLOR[3] + " colored pills helped my body relax a bit too much."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_15"], "I mean neither of us have been getting any decent sleep those past two weeks. I take it your kind does sleep..."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_15"], "Yeah we need 8 hours of sleep... per week. But if I fall asleep now bad things may happen to you. If I was to speculate..."),
@@ -333,6 +352,7 @@ const settings_dialog = [
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_15"], "Try swallowing some... I'll handle things in here as usual. The new blobs suggest we should hurry."),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_15"], "And I'll ditch the " + ITEM_COLOR[1] + " ones since they're making me too spooked to rest. Also your roof is comfy!"),
 	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_15"], "Just poke me if I forget about you: I tend to forget what I ate after I wake up... tee hee!"),
+	// Level 20
 	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_20"], "Errr... " + NAME_PLAYER + "? Not sure how to tell you this, buuuut..."),
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_20"], "What... do... the... " + ITEM_COLOR[5] + "... ones... do? And why is your belly like a bouncy castle now?"),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_20"], "Can we settle for just saying I've been away from the normal activities of my home world for a few hours too long?"),
@@ -341,6 +361,160 @@ const settings_dialog = [
 	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_20"], "Let's get to work then. This means you need to take the... wait, no, do NOT take the " + ITEM_COLOR[5] + " pills!"),
 	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_20"], "Too late. Yum! Why does it say they're your father's on the bottle? Anyway they should do the job just fine."),
 	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_20"], "Yet at what cost for my humanity? Suddenly I wish you had a church in here."),
+	// Level 25 (2nd stage)
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_25"], "Alrighty: I think I've been through every state of mind and body on the list. We tried every substance in your house right?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_25"], "Thankfully not every substance. At least for me once I get out of here, I'm sure gonna need those."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_25"], "You mean the dizzy flour, or the herb that makes you happy when you set it on fire? Your plant life is truly fascinating!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_25"], "And here I thought me seeing your stomach turn into a giant singing monster was just another alien thing. How did you even..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_25"], "Oh I noticed you accidentally lost them under your pillow. Cooking ingredients go to the kitchen right?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_25"], "Oh my god, just tell me what to do next!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_25"], "Well the pills are slowly running out but don't you worry: I'll go to one of your dizzy stores tomorrow and..."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_25"], "They aren't called dizzy stores and for the love of God don't do that! If anyone else sees you..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_25"], "I think a lot of your people saw me. They were too preoccupied to even care though. Is your world doing alright?"),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_25"], "Just... lower the dose for now. They should come in small circular variants too, might make it easier for me to work here."),
+	// Level 30
+	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_30"], "So I know I'm going to regret this. But since I know your name, may as well ask what your gender is."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_30"], "Oh my. You sure you want the answer to that question? It might be a bit to take in..."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_30"], "Yes, I'm sure I don't. May at very least know if I've been eaten by a boy or a girl."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_30"], "\nKAT variant DG\nX 48% Y 64% Z 96%\nA0 18.7 Inch\nA1 6.3 Inch diam\nB1 24.1 Inch diam"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_30"], "Of course size depends on the role we shift to at that given time. It's the same for your people right?"),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_30"], "In my defense, I knew what I was getting into. Actually no... scratch even that excuse out."),
+	// Level 35
+	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_35"], "Why did I hear glass breaking and people yelling followed by fire sirens? Are my parents back so soon?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_35"], "I went inside a bar. And before you freak out no, they don't care there's a huge alien cat among them."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_35"], "Phew... they must think it's a fursuit. Either that or they're too busy on their smartphones to even notice."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_35"], "Don't think it was that: They saw me but the fight started over a cute scarf a human gave me."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_35"], "I... offered to give it to them. But for some reason that made them even more angry so I fled."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_35"], "What the? That doesn't make any sense. Why would they get angry over a gift?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_35"], "I dunno. The donor just said it would look cute on me and found it funny when I wore it."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_35"], "It's black with a red circle. Oh and it has this symbol with two bent lines forming a star inside the circle!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_35"], "... remind me to burn that later. Once I post it online, I've been looking for an excuse to quit social media."),
+	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_35"], "Okey dokey lokey! I'll just hang it from your window in the meantime so it stays fresh."),
+	// Level 40
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_40"], "Hey " + NAME_PLAYER + "? I have a question: Do humans... bite each other that often?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_40"], "We typically punch each other or use baseball bats. Um... it's a sport, but the bat can also be used as a weapon."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_40"], "But you bite too right? Cuz some humans wear the same restraints as their dogs. Is it out of respect for the dog?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_40"], "God damn it: If you went to some creepy ass convention and ran into God knows what hobos..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_40"], "It's just your city center silly! They didn't seem aggressive though, just scared of the other person biting."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_40"], "But unlike a dog's muzzle which uses metal, humans are made out of cloth! Soooo I figure humans aren't that savage?"),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_40"], "Wait, those aren't... actually you know what? I concede to you for just this round."),
+	// Level 45
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_45"], "Awww " + NAME_PLAYER + ": I'm so glad to hear your kind treats all species equally. Like you even trust animals with your lives!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_45"], "What tragic misunderstanding has occurred this time?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_45"], "You have reptiles as politicians, pigs as police officers, and cows working at fast food restaurants!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_45"], "Just curious, no reason in particular: Do you have a thing called sarcasm over on your planet?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_45"], "Hmmm. Is it tasty? I love fish!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_45"], "You always think about food! Just stop looking at those... transmissions: They're full of negative shit."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_45"], "Yeah I know your people can be hard on some things. Like what do they have against sunbathing?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_45"], "Sunbathing? Who said anything bad about that?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_45"], "They showed a person with their skin tanned from standing in the sun a lot and said they're extremely discriminated."),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_45"], "Hold it together " + NAME_PLAYER + ": Ignorance is not cute, none of this is cute..."),
+	// Level 50
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_50"], "Hey " + NAME_PLAYER + "? I think we're running out of meds for you to play doctor with my system."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_50"], "I'm not... wait both the small and large pills? Great, now you really have to go out and buy some more."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_50"], "I understand human money is similar to our promise system except a dozen times more unfair?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_50"], "Take my father's credit card from his pants. He's gonna notice the hole anyway so I'm pretty screwed regardless."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_50"], "Why did you dig a hole in it? Do you plant seeds in cards and make plants grow in your pocket?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_50"], "Yeaaaah you could say that. I had to plant more grass last month to make sure the lawn's in good condition."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_50"], "Gotcha. Your grass is pretty flammable so I can't blame you for needing to plant it often."),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_50"], "So much for being subtle. My PIN is 1337... I mean his, it's a code typically chosen by banks trust me."),
+	// Level 55 (3rd stage)
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_55"], "Just got back from the woo-woo store... I mean pharmacy. Seems I made great use of your money!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_55"], "It's not like I went anywhere. What did the pharmacist say? Did you at least get a discount?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_55"], "At first she said she has plenty of pills at a reasonable price. I told her it's an emergency and you're desperate."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_55"], "When she heard that she said she'd do a favor: Instead of only 5$ per pill she increased it to an amazing 50$ just for us!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_55"], "She said you can thank someone named Capitalism for that. You're lucky to have such kind friends " + NAME_PLAYER + "!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_55"], "Wait. That means you... you... AAAARGH!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_55"], "And the best part is, she gave me larger ones of different colors: Now you can have even more fun sorting them in my belly!"),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_55"], "Assimilating me would be an act of mercy at this rate!"),
+	// Level 60
+	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_60"], "Um... " + NAME_CHARACTER + "? What was all the commotion on the trip today? Another bar fight?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_60"], "On the way back to your place? I met a bunch of human kids who were super duper nice to me!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_60"], "They gave me this thing called a lollipop: You put it in your maw and it melts and is very sweet!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_60"], "Ah so that's why I'm covered in sticky stuff. Couldn't you just eat it on your way back?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_60"], "Oh, that wasn't the issue silly. You see we have this tradition over in my world..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_60"], "When someone gives you something, it's nice to repay them in the most similar way readily available."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_60"], "Where did you find other candy to give them? Please tell me you didn't shoplift."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_60"], "I didn't find any! Of course that wasn't a problem since I'm..."),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_60"], "Aaaand would you look at the time on the clock I can't see from here: It's time for a very big nope!"),
+	// Level 65
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_65"], "Oh my gosh " + NAME_PLAYER + "! Do you have enough clothes on you? Do you need me to eat up a jacket?!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_65"], "Calm down " + NAME_CHARACTER + ", I'm not cold! Hell I took some time getting used to how hot it is in here!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_65"], "Phew! Cuz I just saw a horrible accident on TV. There was this human lady who accidentally lost her shirt..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_65"], "At first I thought nothing of it. Then suddenly panic ensued and people started screaming like crazy!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_65"], "They didn't show what happened after that. I assume she... melted? Or did she perhaps disintegrate!? Oh no!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_65"], "You seriously have no idea just how dumb and terrified our culture is do you?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_65"], "Oh they were very brave: They quickly covered her and dragged her out of view to save her from becoming a goo monster!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_65"], "More like to save people's brains from getting fried: Some things can cause smoke to come out of our ears and stuff."),
+	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_65"], "That's no fun! It happened to a friend of mine once: We had to use nanobots. But they worked fine the next day."),
+	// Level 70
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_70"], "Meow. I hope you don't find this offensive my little " + NAME_PLAYER + ". But your media is a bit... boring."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_70"], "Of course I'm not offended by... wait what did you just call me?!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_70"], "Phew. Cuz I've been looking at it for weeks now and it's so weird, desolate, almost downright creepy!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_70"], "Not a single naughty thing! Like how can you present even the weather without holding at least one massive..."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_70"], "We aren't like you " + NAME_CHARACTER + ". Which to be fair I still wonder when it's a good or bad thing."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_70"], "I mean I can kinda see why: Your anatomy still looks so... oh my gosh: When was the last time you fixed your bodies!?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_70"], "You'll have to be a lot more specific in what you mean by that."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_70"], "Like patch the DNA to fix the faults and limitations of evolutionary dynamics. Oh no... please tell me you know about this!!!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_70"], "Um... I... yes, of course I do: Last... last month! Yeah humanity... fixed its DNA... last month..."),
+	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_70"], "Phew! You had me really scared for a moment. I couldn't even begin to imagine the horrors of living without that."),
+	// Level 75
+	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_75"], "Look, " + NAME_CHARACTER + ". I don't know how long it's been, but I think at least six months have passed so far."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_75"], "About three! Wait did I accidentally eat the wrong thing and warp space and time in there?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_75"], "I just wanna know if I'm ever getting out. I was hoping that me helping fix your system would let you free me."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_75"], "Oh? Oh no silly: There wasn't any need to wait for that. I have a substance to get you out over in my ship!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_75"], "That's incredible news! So that means... wait... wait WHAT DID YOU JUST SAY?!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_75"], "Yeah I keep that stuff with me all the time in case I need to spit big things out: You just..."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_75"], "WHY IN THE NAME OF THE SEVEN HOLY FUCKS DIDN'T YOU TELL ME FROM THE BEGINNING?!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_75"], "I did! But you said... waaaait a minute: Did I forget to patch the meaning for the word \"laxative\" in my translator?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_75"], "When I get out of here, I... I... I'm going to BURN EVERYTHING SO HARD GLOBAL WARMING WILL FEEL LIKE NUCLEAR WINTER!!!"),
+	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_75"], "Now now " + NAME_PLAYER + ": Hush and let kitty make a few preparations first. It's still gonna take a few more days."),
+	// Level 80
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_80"], "Hey " + NAME_PLAYER + "! Good news: I managed to decrypt the password on my ship door!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_80"], "You... forgot... your own password. Amazing, simply amazing."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_80"], "Paws word? It's just how we lock the door when leaving for an extended period: You guess the right key to unlock it!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_80"], "So you brute force your own encryption to unlock a door. Just when I thought your kind can't get any weirder."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_80"], "Yeah I use a pocket decoder: 16 Thz processor, 128 Terabytes of memory... not much but for a keycard it works."),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_80"], "Okay I take that back: That's the kind of weird I'm on board with and without having to question my sanity for it."),
+	// Level 85
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_85"], "Preparations are ready: In just a few days we should be ready to board my ship and get you out!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_85"], "Why does it take days to even board your ship? Let me guess: You need an official invitation from its onboard AI?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_85"], "Nah E-621 is cool. Warp cores need some time to warm up: You can't reach 99% of the speed of light without calibration!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_85"], "So I'm going for a spin at the speed of light. Can't tell if that's cool more than it is terrifying."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_85"], "Yep my special pills don't work without that. I tried at 95% once but nearly puked a black hole."),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_85"], "Sometimes I think you must be messing with me, but after living on Earth in the 2020's you grow to accept about anything."),
+	// Level 90
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_90"], "Aaaand welcome aboard my ship! I'd tell you its name but I don't wanna pop the universe out of existence."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_90"], "Actually that sounds like a great idea. I assume you're bringing me back to the Earth once I'm out?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_90"], "Where else could I take you? I can't keep you in an air aquarium in my ship. Would you rather..."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_90"], "Nope! I would rather... just curious is all. To be fair I often wonder if..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_90"], "Silly " + NAME_PLAYER + "! The air pressure on my world would make you inflate like a balloon and float into the sky!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_90"], "Never learned about pressure doing that in physics class. You sure we're even from the same universe?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_90"], "Different timelines and universes are kinda the same thing. They... um... well there's no time for that now anyway."),
+	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_90"], "Let me get things ready and our final adventure can begin. Liftoff in 3... 2... 1..."),
+	// Level 95
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_95"], "If you thought this was it, oh no: Now we're about to get serious. Warp core engaged!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_95"], "I feel trippy. You sure this is safe?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_95"], "I'd say random greater or equal than zero point nine. Ooops did I say that out loud?"),
+	get_dialog_message(["actor_1", "type_level_3", "filter_difficulty_standard", "filter_level_95"], "Um... nope, I didn't hear anything."),
+	// Level 96
+	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_96"], "What is this white stuff anyway? Oddly enough it feels and smells strangely familiar."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_96"], "It copies different colors it's been in touch with. Best I can explain it without..."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_96"], "Without me visiting your world, I get you. Will everyone be old once I get back?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_96"], "I use a bidirectional pattern so there's not much time travel. It shouldn't be more than about... 10 or so years?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_96"], "Oh crap... oh no... oh fuck. What will everyone think when they finally see me after..."),
+	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_96"], "Just kidding: 10 hours."),
+	// Level 97
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_97"], "Almost there: You should only perceive about three more days of waiting."),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_97"], "Your heart is beating faster than ever: I don't know how much longer I can handle this!"),
+	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_97"], "Just use the pills like you did till now if you can. I wouldn't wanna... lose you now..."),
+	// Level 98
+	get_dialog_message(["actor_1", "type_level_1", "filter_difficulty_standard", "filter_level_98"], "So this is it huh? Tomorrow is the big day..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_98"], "Y... yeah. I guess so. We sure had a lot of fun doing this!"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_98"], "You did: For me it was pretty boring! Besides even if I did I'd never admit it, muahaha!"),
+	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_98"], "Yeaaaah I know you well enough to be aware of that by now."),
+	// Level 99
+	get_dialog_message(["actor_0", "type_level_0", "filter_difficulty_standard", "filter_level_99"], "This is it " + NAME_PLAYER + ": One... more... time..."),
 	// Random messages: Stage 1 (levels 0 to 30) set 1 (4 message dialogue)
 	get_dialog_message(["actor_0_0", "type_random_1", "filter_level_5_29"], "The highest target is red!"),
 	get_dialog_message(["actor_1", "type_random_3"], "Yes, it is."),
@@ -362,7 +536,7 @@ const settings_dialog = [
 
 // Overrides can be used to change settings when reaching a particular level, only some settings are safe to override
 var settings_overrides = [
-	// Warmup stage: 2x pills, 2 colors, 1 - 5 targets
+	// Warmup stage, level 0 - 5: 2x pills, 2 colors, 1 - 5 targets
 	{"level": 0, "setting": "target_count_min", "value": 1},
 	{"level": 0, "setting": "target_count_max", "value": 1},
 	{"level": 1, "setting": "target_count_min", "value": 2},
@@ -375,7 +549,7 @@ var settings_overrides = [
 	{"level": 4, "setting": "target_count_max", "value": 5},
 	{"level": 0, "setting": "item_length", "value": get_length(2)},
 	{"level": 0, "setting": "item_colors", "value": get_color(0, 1)},
-	// 1st stage: 2x pills, 3 colors, 5 - 10 targets
+	// 1st stage, level 5 - 25: 2x pills, 3 colors, 5 - 10 targets
 	{"level": 5, "setting": "target_count_min", "value": 4},
 	{"level": 5, "setting": "target_count_max", "value": 8},
 	{"level": 5, "setting": "item_length", "value": get_length(2)},
@@ -383,7 +557,7 @@ var settings_overrides = [
 	{"level": 10, "setting": "item_colors", "value": get_color(1, 2, 2, 3, 3, 3)},
 	{"level": 15, "setting": "item_colors", "value": get_color(2, 3, 3, 4, 4, 4)},
 	{"level": 20, "setting": "item_colors", "value": get_color(3, 4, 4, 5, 5, 5)},
-	// 2nd stage: 1x - 2x pills, 4 colors, 10 - 15 targets
+	// 2nd stage, level 25 - 55: 1x - 2x pills, 4 colors, 10 - 15 targets
 	{"level": 25, "setting": "target_count_min", "value": 4},
 	{"level": 25, "setting": "target_count_max", "value": 12},
 	{"level": 25, "setting": "item_length", "value": get_length(1, 2, 2)},
@@ -393,7 +567,7 @@ var settings_overrides = [
 	{"level": 40, "setting": "item_colors", "value": get_color(0, 1, 1, 2, 2, 2, 3, 3, 3, 3)},
 	{"level": 45, "setting": "item_colors", "value": get_color(1, 2, 2, 3, 3, 3, 4, 4, 4, 4)},
 	{"level": 50, "setting": "item_colors", "value": get_color(2, 3, 3, 4, 4, 4, 5, 5, 5, 5)},
-	// 3rd stage: 1x - 3x pills, 3 colors, 15 - 20 targets
+	// 3rd stage, level 55 - 90: 1x - 3x pills, 3 colors, 15 - 20 targets
 	{"level": 55, "setting": "target_count_min", "value": 8},
 	{"level": 55, "setting": "target_count_max", "value": 12},
 	{"level": 55, "setting": "item_length", "value": get_length(1, 2, 2, 3)},
@@ -404,7 +578,7 @@ var settings_overrides = [
 	{"level": 75, "setting": "item_colors", "value": get_color(3, 3, 3, 5, 5, 1)},
 	{"level": 80, "setting": "item_colors", "value": get_color(4, 4, 4, 0, 0, 2)},
 	{"level": 85, "setting": "item_colors", "value": get_color(5, 5, 5, 1, 1, 3)},
-	// Final stage: 2x - 3x pills, 2 - 3 colors, 20 - 25 targets
+	// Final stage, level 90 - 100: 2x - 3x pills, 2 - 3 colors, 20 - 25 targets
 	{"level": 90, "setting": "target_count_min", "value": 8},
 	{"level": 90, "setting": "target_count_max", "value": 16},
 	{"level": 90, "setting": "item_length", "value": get_length(1, 2)},
@@ -419,7 +593,7 @@ var settings_overrides = [
 	{"level": 97, "setting": "item_colors", "value": get_color(undefined, 6, 6)},
 	{"level": 98, "setting": "item_colors", "value": get_color(undefined, 6, 6)},
 	{"level": 99, "setting": "item_colors", "value": get_color(undefined, 6, 6)},
-	// Secret stage: 1x pills, 8 colors, 0 targets
+	// Secret stage, level 100: 1x pills, 8 colors, 0 targets
 	{"level": 100, "setting": "target_count_min", "value": 0},
 	{"level": 100, "setting": "target_count_max", "value": 0},
 	{"level": 100, "setting": "item_length", "value": get_length(1)},
