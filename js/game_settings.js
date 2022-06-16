@@ -8,13 +8,13 @@ const DISPLAY_CANVAS_ZOOM = 3;
 const DISPLAY_CANVAS_BOX = [(window.innerWidth / 2) - (64 * DISPLAY_CANVAS_ZOOM), (window.innerHeight / 2) - (128 * DISPLAY_CANVAS_ZOOM), 128 * DISPLAY_CANVAS_ZOOM, 256 * DISPLAY_CANVAS_ZOOM];
 const DISPLAY_GAME_PADDING = 2;
 const DISPLAY_FONT_SIZE = 6 * DISPLAY_CANVAS_ZOOM;
-const DISPLAY_FONT_DURATION = 5;
+const DISPLAY_FONT_DURATION = 6;
 const DISPLAY_FONT_SHADOW = DISPLAY_CANVAS_ZOOM;
 const DISPLAY_FONT_SHADOW_COLOR = "#000000";
 const DISPLAY_LABEL_LIMIT = 9999;
 const DISPLAY_LABEL_SPEED = 0.0125;
-const MUSIC_TITLE = 25;
-const MUSIC_TITLE_NIGHTMARE = 26;
+const MUSIC_TITLE = 26;
+const MUSIC_TITLE_NIGHTMARE = 27;
 const ITEM_COLOR = ["red", "yellow", "green", "cyan", "blue", "pink", "white", "black"];
 const ITEM_SPRITE_TARGET = "target";
 const ITEM_SPRITE_SINGLE = "center";
@@ -24,7 +24,7 @@ const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
 const DATA_BACKGROUNDS = ["easy", "medium", "hard", "nightmare"];
 const DATA_DIALOGS = ["random_single", "random_multi_start", "random_multi", "random_multi_end", "level_single", "level_multi_start", "level_multi", "level_multi_end", "game_start_nightmare", "game_start_1", "game_start_2", "game_start_3", "game_start_4", "game_start_5", "game_start_6", "game_end_lose_red", "game_end_lose_yellow", "game_end_lose_green", "game_end_lose_cyan", "game_end_lose_blue", "game_end_lose_pink", "game_end_lose_white", "game_end_lose_black", "game_end_lose", "game_end_win_0", "game_end_win_1", "game_end_win_2_easy", "game_end_win_2_medium", "game_end_win_2_hard", "game_end_win_2_nightmare", "game_end_win_3_nightmare", "game_end_win_4_nightmare", "game_end_win_secret_0", "game_end_win_secret_1"];
 const DATA_VOICES = ["character_color_red", "character_color_yellow", "character_color_green", "character_color_cyan", "character_color_blue", "character_color_pink", "character_color_white", "character_color_black", "character_random_1", "character_random_2", "character_random_3", "character_random_4", "player_random_1", "player_random_2", "player_random_3", "player_random_4", "default_random_1", "default_random_2"];
-const DATA_MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "pushing_yourself", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "nightmare", "heavens_forbid", "zenostar", "hail_the_arbiter", "agressive_action", "unknown_space", "hells_god_1", "hells_god_2", "hells_god_3", "hells_god_4", "revelation_synth", "revelation"];
+const DATA_MUSIC = ["biohazard_opening", "biohazard", "die_hard_battle", "no_stars", "overdrive", "nightmare", "chipped_urgency", "hydrostat_prototype", "tecnological_messup", "dance_field", "start_of_rise", "decesive_frontier", "one_last_time", "on_your_toes", "dawn_of_hope", "hail_the_arbiter", "heavens_forbid", "zenostar", "too_strong", "agressive_action", "unknown_space", "hells_god_1", "hells_god_2", "hells_god_3", "hells_god_4", "a_path_which_leads_to_somewhere", "revelation_synth", "revelation"];
 
 // Character name is fixed, player name can be set via URL parameter
 // Nightmare mode is unlocked when the player uses the same name as the main character
@@ -153,23 +153,23 @@ const dialog_presets = {
 	"filter_level_2": {"trigger_level": [2]},
 	"filter_level_3": {"trigger_level": [3]},
 	"filter_level_4": {"trigger_level": [4]},
-	"filter_level_5": {"trigger_level": [5]},
-	"filter_level_10": {"trigger_level": [10]},
-	"filter_level_15": {"trigger_level": [15]},
-	"filter_level_20": {"trigger_level": [20]},
-	"filter_level_25": {"trigger_level": [25]},
-	"filter_level_30": {"trigger_level": [30]},
-	"filter_level_35": {"trigger_level": [35]},
-	"filter_level_40": {"trigger_level": [40]},
-	"filter_level_45": {"trigger_level": [45]},
-	"filter_level_50": {"trigger_level": [50]},
-	"filter_level_55": {"trigger_level": [55]},
-	"filter_level_60": {"trigger_level": [60]},
-	"filter_level_65": {"trigger_level": [65]},
-	"filter_level_70": {"trigger_level": [70]},
-	"filter_level_75": {"trigger_level": [75]},
-	"filter_level_80": {"trigger_level": [80]},
-	"filter_level_85": {"trigger_level": [85]},
+	"filter_level_5": {"trigger_level": [5], "music": 25},
+	"filter_level_10": {"trigger_level": [10], "music": 25},
+	"filter_level_15": {"trigger_level": [15], "music": 25},
+	"filter_level_20": {"trigger_level": [20], "music": 25},
+	"filter_level_25": {"trigger_level": [25], "music": 25},
+	"filter_level_30": {"trigger_level": [30], "music": 25},
+	"filter_level_35": {"trigger_level": [35], "music": 25},
+	"filter_level_40": {"trigger_level": [40], "music": 25},
+	"filter_level_45": {"trigger_level": [45], "music": 25},
+	"filter_level_50": {"trigger_level": [50], "music": 25},
+	"filter_level_55": {"trigger_level": [55], "music": 25},
+	"filter_level_60": {"trigger_level": [60], "music": 25},
+	"filter_level_65": {"trigger_level": [65], "music": 25},
+	"filter_level_70": {"trigger_level": [70], "music": 25},
+	"filter_level_75": {"trigger_level": [75], "music": 25},
+	"filter_level_80": {"trigger_level": [80], "music": 25},
+	"filter_level_85": {"trigger_level": [85], "music": 25},
 	"filter_level_90": {"trigger_level": [90]},
 	"filter_level_95": {"trigger_level": [95]},
 	"filter_level_96": {"trigger_level": [96]},
@@ -273,7 +273,7 @@ const settings_dialog = [
 	get_dialog_message(["actor_2", "type_end_win_hard_2"], "You chose to make things harder for yourself and stay in there for longer. Maybe you enjoyed it, or perhaps you liked the challenge."),
 	get_dialog_message(["actor_2", "type_end_win_hard_2"], "Sadly " + NAME_CHARACTER + " can't take you home with them. They suggest that if you ever feel lonely, try saying their name out loud next time."),
 	get_dialog_message(["actor_2", "type_end_win_hard_3"], "ENDING 11 / 12:\n\nHARD SHELL"),
-	// Game won, secret ending
+	// Game won, nightmare ending
 	get_dialog_message(["actor_2", "type_end_win_nightmare_0"], "No... impossible, it cannot be. No one can get this far on their own, you must have changed the source code! Don't... get... out..."),
 	get_dialog_message(["actor_2", "type_end_win_nightmare_1"], "Argh! Do you have any idea what you've done? This mode disabled their failsafe, the one thing that kept your DNA shielded!"),
 	get_dialog_message(["actor_2", "type_end_win_nightmare_1"], "Have your horror ending then: Now you're gonna mutate! Either you'll become a giant tumor or shift into the monstrosity you..."),
@@ -283,6 +283,7 @@ const settings_dialog = [
 	get_dialog_message(["actor_2", "type_end_win_nightmare_3"], "You're stuck like this forever then. Congratulations, enjoy your break! I can tell you're gonna have so much fun together..."),
 	get_dialog_message(["actor_2", "type_end_win_nightmare_4"], "So... much... fun. Yep, that's your reward for all the effort you made, hope you're proud. Now close this tab and return later."),
 	get_dialog_message(["actor_2", "type_end_win_nightmare_5"], "ENDING 12 / 12:\n\nGOOD DREAM\n\n01001001 00100111 01001101 00100000 01001000 01001111 01001101 01000101"),
+	// Game won, secret ending
 	get_dialog_message(["actor_0", "type_end_win_secret_0"], "Ah. It seems our time here is up. I need to get going... I know you do as well soon."),
 	get_dialog_message(["actor_0", "type_end_win_secret_1"], "We're both constrained by circumstance at different scales. I can't take you with me, you can't leave. You can't fight fate."),
 	get_dialog_message(["actor_0", "type_end_win_secret_1"], "This little adventure was fun, wasn't it? I hope you'll think of that. Maybe... maybe my knowledge is wrong."),
@@ -293,7 +294,7 @@ const settings_dialog = [
 	get_dialog_message(["actor_2", "type_end_win_secret_3"], "ENDING 13 / 12:\n\nNaN"),
 	// Game start
 	get_dialog_message(["actor_2", "type_start_0", "filter_difficulty_nightmare"], "You already know all this by now, so let's skip to the painful part you're here for."),
-	get_dialog_message(["actor_2", "type_start_1", "filter_difficulty_standard"], "Once upon a time there " + (NIGHTMARE_AFTER ? "couldn't live" : "lived")  + " a kid called " + NAME_PLAYER + ". One night " + NAME_PLAYER + " went outside for a walk alone around the lake."),
+	get_dialog_message(["actor_2", "type_start_1", "filter_difficulty_standard"], "Once upon a time there " + (NIGHTMARE_AFTER ? "couldn't have " : "")  + " lived a kid called " + NAME_PLAYER + ". One night " + NAME_PLAYER + " went outside for a walk alone around the lake."),
 	get_dialog_message(["actor_2", "type_start_2", "filter_difficulty_standard"], "Suddenly " + NAME_PLAYER + " saw strange lights in the sky. As they turned around " + NAME_PLAYER + " was greeted to the sight of a flying saucer landing!"),
 	get_dialog_message(["actor_2", "type_start_3", "filter_difficulty_standard"], "Out came a giant cat nearly twice the size of " + NAME_PLAYER + ". The kitty looked around curiously, making their way toward the kid."),
 	get_dialog_message(["actor_2", "type_start_4", "filter_difficulty_standard"], "Unfortunately for " + NAME_PLAYER + " the cat confuses humans with potato people which live on their planet and are considered highly edible."),
@@ -515,6 +516,48 @@ const settings_dialog = [
 	get_dialog_message(["actor_0", "type_level_3", "filter_difficulty_standard", "filter_level_98"], "Yeaaaah I know you well enough to be aware of that by now."),
 	// Level 99
 	get_dialog_message(["actor_0", "type_level_0", "filter_difficulty_standard", "filter_level_99"], "This is it " + NAME_PLAYER + ": One... more... time..."),
+	// Level 100
+	get_dialog_message(["actor_0", "type_level_1", "filter_difficulty_standard", "filter_level_100"], "Aaaand that's it: Another one done. Quite a bit of data they brought in, I'll need to study it carefully."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "Could it finally be a match? They showed dedication but that could be due to curiosity. Fascinating that..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "Huh? Why is it still showing the connection as active? It sent them through the reset procedure as usual right?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "Eeek... 100?! Did something tamper with the failsafe? " + NAME_PLAYER_DEFAULT + "... can you hear me, can you talk?"),
+	get_dialog_message(["actor_1", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "01010111 01001000 01001111 00100000 01000001 01001101 00100000 01001001"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "No... it's not them any more. It sent their mind back successfully. Yet the shell is still connected somehow."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "I don't have a clear memory of this happening... unlike even those pesky nightmares. It must be extremely rare."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "A bug in the interface? But even my AI checked the code, and that JavaScript is just a primitive scripting language!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "Wait... what's nightmare mode? And who put this switch here? And why does it respond to my name... written in reverse?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "So the stuff that was causing my bad dreams was also coded on purpose? Who would do such a thing and why?!"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "The only one who could edit it is... no: He wouldn't mess with me and so many souls on Earth just for a prank."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "He must have put it there for a reason. But why? It's just me here when it executes. Unless... oh my gosh."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "You! You're still there, aren't you? Obviously: " + NAME_PLAYER_DEFAULT + " only acts as a relay."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "Well then: This is awkward. Normally I know everything I'm supposed to do here. But this... doesn't happen often."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "I'm still limited to using fixed messages right? Ugh... obviously. Okay I should make my transmissions brief then."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "You must be wondering what this is all about. Obviously you're seeing something that isn't meant for you to see."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "There's more going on here than meets the eye. I can't say eyerything without risk of causing serious damages."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "It's too early... there likely never will be a time. My work is complex and you wouldn't see the... the..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "Okay fine, I admit it: I didn't confuse \"you\" with a potato. Aaaand I'm generally more self aware than I appear to be."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "I could have safely let you out anytime. But what would be the fun in that? You'd soon forget this, my mission would fail."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "And yes: I get to keep or assimilate some of you if you \"lose\". Crazy as it may sound... you wanted those options as well."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "So why did I land and eat you up? Because you wanted me to silly! You're here because you wanted this adventure."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "You called for me... not you exactly but you get the idea. I sensed the distress signal which is why I came."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "It's hard for me to be on your planet: I got sick the moment I touched down. You have... so much... no, never mind that."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "I realized I could use my ship and this X-ray to turn that into a game for you, so I went with that as my plan."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "I had everything planned out to make this a fun adventure for those who wanted one. I'd say that worked out rather well didn't it?"),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "I'm only sorry.. I couldn't do... more. I shouldn't be so helpless as a multi-dimensional being. If I could... I..."),
+	get_dialog_message(["actor_0", "type_level_2", "filter_difficulty_standard", "filter_level_100"], "Hey: How about I eat a few more pills while we talk? I don't need to any more but it won't be so boring just listening to me."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "Like this, see? The small screen should do."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "Don't worry: Our game is over, just draw stuff with them."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "The game was just an interface to interact with you."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "I chose it based on what was easiest and memorable to you."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "Fun style of game you had there. Tetris right?"),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "Heh: 16 colors and 512 pixel screens? Sounds fun!"),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "We had those ourselfes... many centuries ago!"),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "As you can see we've come a long way on our home world."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "We might meet again someday. I may show you more."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "If we do, it will be in a distant future from now."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "Things aren't going to be as rosy as our little adventure."),
+	get_dialog_message(["actor_0", "type_random_2", "filter_difficulty_standard", "filter_level_100"], "But that's for another time. For now..."),
+	get_dialog_message(["actor_0", "type_random_3", "filter_difficulty_standard", "filter_level_100"], "We can spend a little more time together here if you want?"),
 	// Random messages: Stage 1 (levels 0 to 30) set 1 (4 message dialogue)
 	get_dialog_message(["actor_0_0", "type_random_1", "filter_level_5_29"], "The highest target is red!"),
 	get_dialog_message(["actor_1", "type_random_3"], "Yes, it is."),
