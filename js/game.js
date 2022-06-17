@@ -93,6 +93,8 @@ class data {
 				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_END[t]);
 			data.load_audio("item_clear_" + ITEM_COLOR[c]);
 		}
+		for(let s in DATA_SCENE)
+			data.load_image("scene/" + DATA_SCENE[s]);
 		for(let d in DATA_DIALOGS)
 			data.load_image("dialog/" + DATA_DIALOGS[d]);
 		for(let v in DATA_VOICES)
@@ -524,6 +526,8 @@ class game_background {
 	constructor(parent, box, difficulty) {
 		const background = DATA_BACKGROUNDS[Math.floor(difficulty * 2) - 1];
 		this.box = box;
+		this.element_scene = html_create(parent, "img", "scene", this.box);
+		this.element_scene.setAttribute("src", data.images["scene/" + DATA_SCENE[0]].src);
 		this.element_background = html_create(parent, "img", "background", this.box);
 		this.element_background.setAttribute("src", data.images["background_" + background].src);
 		this.element_eyes = html_create(parent, "img", "foreground", this.box);
@@ -536,6 +540,13 @@ class game_background {
 		this.element_background.remove();
 		this.element_eyes.remove();
 		this.element_foreground.remove();
+	}
+
+	// Update the scene to a particular index
+	set_scene(index) {
+		var src = data.images["scene/" + DATA_SCENE[index]].src;
+		if(this.element_scene.getAttribute("src") != src)
+			this.element_scene.setAttribute("src", src);
 	}
 
 	// Update the foreground with a particular color
@@ -651,6 +662,7 @@ class game {
 
 		audio.music_speed = NIGHTMARE ? 0.5 : 1;
 		audio.play_music(this.settings.music);
+		this.background.set_scene(this.settings.scene);
 		this.timer_interval = Math.max(this.settings.time / this.difficulty * 1000, 1);
 		this.timer = setInterval(this.update.bind(this), this.timer_interval);
 		this.update();
@@ -957,7 +969,7 @@ class game {
 			}
 
 		// Cheat to jump to the next level, disabled in nightmare mode
-		if(event.key == "Backspace" && !NIGHTMARE)
+		if(event.key == "Backspace" && !NIGHTMARE && !NIGHTMARE_AFTER)
 			this.game_end(true);
 
 		// Display gameplay instructions as well as status effects for active colors
