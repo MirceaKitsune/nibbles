@@ -1,6 +1,7 @@
 // This file contains only the settings objects and helper functions used to generate them, the engine is launched after this and reads the relevant variables
 // ITEM_COLOR must contain color names matching their respective image and sound file names, should be 8 in total to match statuses
 // ITEM_SPRITE_SEGMENT_* is based on item angle: 0 = up, 1 = right, 2 = down, 3 = left
+// DATA_SCENE is the list of scene images, each entry must be accompanied by a document body color in DATA_SCENE_COLOR
 // DATA_BACKGROUNDS represents the background names based on difficulty, 4 in total
 // DATA_DIALOGS is the list of dialog skins used by text messages
 // DATA_VOICES contains the name of each vocal pattern sound
@@ -13,6 +14,8 @@ const DISPLAY_FONT_SHADOW = DISPLAY_CANVAS_ZOOM;
 const DISPLAY_FONT_SHADOW_COLOR = "#000000";
 const DISPLAY_LABEL_LIMIT = 9999;
 const DISPLAY_LABEL_SPEED = 0.0125;
+const DISPLAY_COLOR = "#dfdfdf";
+const SOUND_TICK = "tick";
 const MUSIC_TITLE = 26;
 const MUSIC_TITLE_NIGHTMARE = 27;
 const ITEM_COLOR = ["red", "yellow", "green", "cyan", "blue", "pink", "white", "black"];
@@ -22,6 +25,7 @@ const ITEM_SPRITE_SEGMENT_START = ["bottom", "left", "top", "right"];
 const ITEM_SPRITE_SEGMENT_CENTER = ["vertical", "horizontal", "vertical", "horizontal"];
 const ITEM_SPRITE_SEGMENT_END = ["top", "right", "bottom", "left"];
 const DATA_SCENE = ["home", "garden", "lake", "roof", "bedroom", "home", "garden", "lake", "roof", "bedroom", "home", "garden", "lake", "roof", "bedroom", "home", "garden", "lake", "roof", "bedroom", "garden"];
+const DATA_SCENE_COLOR = ["#7f0000", "#00ffff", "#00007f", "#000000", "#7f007f", "#7f0000", "#00ffff", "#00007f", "#000000", "#7f007f", "#7f0000", "#00ffff", "#00007f", "#000000", "#7f007f", "#7f0000", "#00ffff", "#00007f", "#000000", "#7f007f", "#ffffff"];
 const DATA_BACKGROUNDS = ["easy", "medium", "hard", "nightmare"];
 const DATA_DIALOGS = ["random_single", "random_multi_start", "random_multi", "random_multi_end", "level_single", "level_multi_start", "level_multi", "level_multi_end", "game_start_nightmare", "game_start_1", "game_start_2", "game_start_3", "game_start_4", "game_start_5", "game_start_6", "game_end_lose_red", "game_end_lose_yellow", "game_end_lose_green", "game_end_lose_cyan", "game_end_lose_blue", "game_end_lose_pink", "game_end_lose_white", "game_end_lose_black", "game_end_lose", "game_end_win_0", "game_end_win_1", "game_end_win_2_easy", "game_end_win_2_medium", "game_end_win_2_hard", "game_end_win_2_nightmare", "game_end_win_3_nightmare", "game_end_win_4_nightmare", "game_end_win_secret_0", "game_end_win_secret_1"];
 const DATA_VOICES = ["character_color_red", "character_color_yellow", "character_color_green", "character_color_cyan", "character_color_blue", "character_color_pink", "character_color_white", "character_color_black", "character_random_1", "character_random_2", "character_random_3", "character_random_4", "player_random_1", "player_random_2", "player_random_3", "player_random_4", "default_random_1", "default_random_2"];
@@ -673,6 +677,7 @@ const SETTINGS = {
 	"item_length_nightmare": [3, 4],
 	"item_colors_nightmare": [7],
 	"statuses": [5, 5, 0.5, 0.5, 5, 2.5, 1, 0.25],
+	"scene": undefined,
 	"music": undefined,
 	"dialog": settings_dialog,
 	"overrides": settings_overrides

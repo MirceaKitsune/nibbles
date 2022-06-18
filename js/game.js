@@ -105,6 +105,7 @@ class data {
 
 	// Create the core element and title screen, the title screen isn't stored in the cache and is used to control the process
 	static load_start() {
+		document.body.style["background-color"] = DISPLAY_COLOR;
 		data.element_canvas = html_create(document.body, "div", "canvas", [DISPLAY_CANVAS_BOX[0], DISPLAY_CANVAS_BOX[1], DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
 		data.element_title = html_create(data.element_canvas, "img", "title", [0, 0, DISPLAY_CANVAS_BOX[2], DISPLAY_CANVAS_BOX[3]]);
 		data.element_title.setAttribute("src", "img/title_loading.gif");
@@ -183,7 +184,6 @@ class audio {
 	static channel_sound = new Audio();
 	static channel_music = new Audio();
 	static sound_busy = false;
-	static sound_default = "tick";
 	static sound = undefined;
 	static music_speed = 1;
 
@@ -199,7 +199,7 @@ class audio {
 	}
 
 	// Play a custom sound if one is scheduled, the default sound is played otherwise
-	// Custom sounds have higher priority and may interrupt any ongoing sound, the default sound has low priority and may never cut another sound
+	// Custom sounds have higher priority and may interrupt any ongoing sound, the tick sound has low priority and may never cut another sound
 	static play_sound() {
 		if(audio.sound) {
 			if(audio.channel_sound.src != data.audio[audio.sound].src)
@@ -207,8 +207,8 @@ class audio {
 			audio.channel_sound.play().catch(() => {});
 			audio.sound_busy = true;
 		} else if(!audio.sound_busy) {
-			if(audio.channel_sound.src != data.audio[audio.sound_default].src)
-				audio.channel_sound.src = data.audio[audio.sound_default].src;
+			if(audio.channel_sound.src != data.audio[SOUND_TICK].src)
+				audio.channel_sound.src = data.audio[SOUND_TICK].src;
 			audio.channel_sound.play().catch(() => {});
 		}
 		audio.sound = undefined;
@@ -528,6 +528,7 @@ class game_background {
 		this.box = box;
 		this.element_scene = html_create(parent, "img", "scene", this.box);
 		this.element_scene.setAttribute("src", data.images["scene/" + DATA_SCENE[0]].src);
+		this.element_scene.style["display"] = "block";
 		this.element_background = html_create(parent, "img", "background", this.box);
 		this.element_background.setAttribute("src", data.images["background_" + background].src);
 		this.element_eyes = html_create(parent, "img", "foreground", this.box);
@@ -542,11 +543,13 @@ class game_background {
 		this.element_foreground.remove();
 	}
 
-	// Update the scene to a particular index
+	// Update or clear the scene and background color
 	set_scene(index) {
-		var src = data.images["scene/" + DATA_SCENE[index]].src;
-		if(this.element_scene.getAttribute("src") != src)
+		var src = isNaN(index) ? undefined : data.images["scene/" + DATA_SCENE[index]].src;
+		if(src && this.element_scene.getAttribute("src") != src)
 			this.element_scene.setAttribute("src", src);
+		this.element_scene.style["display"] = isNaN(index) ? "none" : "block";
+		document.body.style["background-color"] = isNaN(index) ? DISPLAY_COLOR : DATA_SCENE_COLOR[index];
 	}
 
 	// Update the foreground with a particular color
@@ -684,9 +687,10 @@ class game {
 			// The round was won and this was the final level
 			if(NIGHTMARE)
 				window.location.hash = NAME_PLAYER = NAME_PLAYER_NIGHTMARE;
+			this.background.set_scene(undefined);
+			this.dialog.pick(4, this.difficulty, this.level, color);
 			audio.sound = "game_won";
 			audio.play_sound();
-			this.dialog.pick(4, this.difficulty, this.level, color);
 		} else if(won) {
 			// The round was won
 			audio.sound = "game_continue";
@@ -696,9 +700,10 @@ class game {
 			this.game_start();
 		} else {
 			// The game was lost
+			this.background.set_scene(undefined);
+			this.dialog.pick(3, this.difficulty, this.level, color);
 			audio.sound = "game_lost";
 			audio.play_sound();
-			this.dialog.pick(3, this.difficulty, this.level, color);
 		}
 	}
 
@@ -999,4 +1004,11 @@ class game {
 	}
 }
 
+// Ask for confirmation before closing the window if a game is running
+window.onbeforeunload = function() {
+	if(data.game)
+		return "Closing this page will erase the current game, are you sure?"
+}
+
+// Load the data
 data.load_start();
