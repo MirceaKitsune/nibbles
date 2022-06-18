@@ -91,6 +91,7 @@ class data {
 				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_CENTER[t]);
 			for(let t in ITEM_SPRITE_SEGMENT_END)
 				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_END[t]);
+			data.load_image("indicator/" + ITEM_COLOR[c]);
 			data.load_audio("item_clear_" + ITEM_COLOR[c]);
 		}
 		for(let s in DATA_SCENE)
@@ -578,6 +579,7 @@ class game {
 		this.items = [];
 		this.items_next = [];
 		this.timer = undefined;
+		this.timer_extra = undefined;
 		this.timer_interval = 0;
 
 		const box = [0, 0, this.settings.background[0], this.settings.background[1]];
@@ -588,6 +590,9 @@ class game {
 		this.dialog = new game_dialog(parent, box, this.settings.dialog);
 
 		this.element = html_create(parent, "div", "game", [this.settings.position[0], this.settings.position[1], this.settings.grid[0] * this.settings.resolution, (this.settings.grid[1] + this.settings.previews + DISPLAY_GAME_PADDING) * this.settings.resolution]);
+		this.element_indicator = html_create(parent, "img", "indicator", box);
+		this.element_indicator.setAttribute("src", data.images["indicator/" + ITEM_COLOR[0]].src);
+		this.element_indicator.style["display"] = "none";
 		this.element_label_score = html_create(parent, "label", "label label_score", [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
 		this.element_label_score.style["font-size"] = DISPLAY_FONT_SIZE + "px";
 		this.element_label_score.innerHTML = 0;
@@ -602,7 +607,8 @@ class game {
 
 	remove() {
 		clearInterval(this.timer);
-		this.timer = undefined;
+		clearTimeout(this.timer_extra);
+		this.timer = this.timer_extra = undefined;
 
 		this.background.remove();
 		this.dialog.remove();
@@ -675,7 +681,8 @@ class game {
 	// End the existing game
 	game_end(success) {
 		clearInterval(this.timer);
-		this.timer = undefined;
+		clearTimeout(this.timer_extra);
+		this.timer = this.timer_extra = undefined;
 		this.dialog.hide();
 		audio.music_speed = 1;
 
@@ -837,7 +844,12 @@ class game {
 
 	// Random activation of a status effect for the given color and count, probability accounts for tick rate
 	update_status(count, index) {
-		return (count / (this.settings.grid[0] * this.settings.grid[1])) * this.settings.statuses[index] * (this.timer_interval / 1000) * this.difficulty > Math.random();
+		var active = (count / (this.settings.grid[0] * this.settings.grid[1])) * this.settings.statuses[index] * (this.timer_interval / 1000) * this.difficulty > Math.random();
+		if(active) {
+			this.element_indicator.setAttribute("src", data.images["indicator/" + ITEM_COLOR[index]].src);
+			this.element_indicator.style["display"] = "block";
+		}
+		return active;
 	}
 
 	// Update function that executes every tick
@@ -852,16 +864,19 @@ class game {
 			if(this.items[i].active)
 				active_pos = this.items[i].position;
 
-		// Apply background updates
+		// Apply background updates, the status indicator is hidden so it may be set from here on if a status executes
 		const color = targets.indexOf(Math.max(...targets));
 		const active_pos_x = Math.round(((active_pos[0] * 2) - this.settings.grid[0]) / this.settings.grid[0]) * this.settings.background_look;
 		const active_pos_y = Math.round(((active_pos[1] * 2) - this.settings.grid[1]) / this.settings.grid[1]) * this.settings.background_look;
 		this.background.set_foreground(targets[color] > 1 ? color : undefined);
 		this.background.set_eyes(targets[color] > 0 ? color : undefined, [active_pos_x, active_pos_y]);
+		this.element_indicator.style["display"] = "none";
 
 		// Status 0 & 1: Preform an extra update or skip this tick
-		if(this.update_status(targets[0], 0))
-			this.update();
+		if(this.update_status(targets[0], 0)) {
+			clearTimeout(this.timer_extra);
+			this.timer_extra = setTimeout(this.update.bind(this), this.timer_interval * Math.random());
+		}
 		if(this.update_status(targets[1], 1))
 			return;
 

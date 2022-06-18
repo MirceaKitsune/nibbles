@@ -56,6 +56,17 @@
 	pointer-events: none;
 }
 
+.indicator {
+	position: absolute;
+	overflow: hidden;
+
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+
+	z-index: 3;
+	pointer-events: none;
+}
+
 .scene {
 	position: absolute;
 	overflow: hidden;
