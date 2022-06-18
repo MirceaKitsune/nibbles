@@ -91,8 +91,9 @@ class data {
 				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_CENTER[t]);
 			for(let t in ITEM_SPRITE_SEGMENT_END)
 				data.load_image("item_" + ITEM_COLOR[c] + "_" + ITEM_SPRITE_SEGMENT_END[t]);
-			data.load_image("indicator/" + ITEM_COLOR[c]);
+			data.load_image("indicator_" + ITEM_COLOR[c]);
 			data.load_audio("item_clear_" + ITEM_COLOR[c]);
+			data.load_audio("item_indicator_" + ITEM_COLOR[c]);
 		}
 		for(let s in DATA_SCENE)
 			data.load_image("scene/" + DATA_SCENE[s]);
@@ -591,7 +592,7 @@ class game {
 
 		this.element = html_create(parent, "div", "game", [this.settings.position[0], this.settings.position[1], this.settings.grid[0] * this.settings.resolution, (this.settings.grid[1] + this.settings.previews + DISPLAY_GAME_PADDING) * this.settings.resolution]);
 		this.element_indicator = html_create(parent, "img", "indicator", box);
-		this.element_indicator.setAttribute("src", data.images["indicator/" + ITEM_COLOR[0]].src);
+		this.element_indicator.setAttribute("src", data.images["indicator_" + ITEM_COLOR[0]].src);
 		this.element_indicator.style["display"] = "none";
 		this.element_label_score = html_create(parent, "label", "label label_score", [this.settings.position[0], this.settings.position[1], this.settings.resolution * this.settings.grid[0], this.settings.resolution]);
 		this.element_label_score.style["font-size"] = DISPLAY_FONT_SIZE + "px";
@@ -683,6 +684,7 @@ class game {
 		clearInterval(this.timer);
 		clearTimeout(this.timer_extra);
 		this.timer = this.timer_extra = undefined;
+		this.element_indicator.style["display"] = "none";
 		this.dialog.hide();
 		audio.music_speed = 1;
 
@@ -846,8 +848,9 @@ class game {
 	update_status(count, index) {
 		var active = (count / (this.settings.grid[0] * this.settings.grid[1])) * this.settings.statuses[index] * (this.timer_interval / 1000) * this.difficulty > Math.random();
 		if(active) {
-			this.element_indicator.setAttribute("src", data.images["indicator/" + ITEM_COLOR[index]].src);
+			this.element_indicator.setAttribute("src", data.images["indicator_" + ITEM_COLOR[index]].src);
 			this.element_indicator.style["display"] = "block";
+			audio.sound = "item_indicator_" + ITEM_COLOR[index];
 		}
 		return active;
 	}
@@ -875,10 +878,12 @@ class game {
 		// Status 0 & 1: Preform an extra update or skip this tick
 		if(this.update_status(targets[0], 0)) {
 			clearTimeout(this.timer_extra);
-			this.timer_extra = setTimeout(this.update.bind(this), this.timer_interval * Math.random());
+			this.timer_extra = setTimeout(this.update.bind(this), (this.timer_interval * 0.25) + (this.timer_interval * 0.5 * Math.random()));
 		}
-		if(this.update_status(targets[1], 1))
+		if(this.update_status(targets[1], 1)) {
+			audio.play_sound();
 			return;
+		}
 
 		// Handle item movement and status effects
 		const float = this.update_status(targets[4], 4);
